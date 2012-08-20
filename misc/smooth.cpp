@@ -46,6 +46,11 @@ int get(int mat[][5005], int i, int j)
 
 void smooth()
 {
+    assert(K>=1);
+    if (K==1) {
+        memcpy(B, A, sizeof A);
+        return;
+    }
     // calc C
     for(int j=0; j<N; ++j) {
         C[0][j] = A[0][j];

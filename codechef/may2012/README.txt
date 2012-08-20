@@ -1,0 +1,3 @@
+Problems Successfully Solved: 	
+
+MAY12: STONES, CHEFLUCK, CHEFHOME, TWSTR, DIVPAIR

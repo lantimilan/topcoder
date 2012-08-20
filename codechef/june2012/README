@@ -1,0 +1,19 @@
+FLY must have a logical error, but where is it?
+
+CLOEST can be improved, scored by number of neighbors found, now only has 1.
+
+COOLNUM can use binary search for LC and UC, LC is between 10^n-1 to N, and UC
+is between N+1 to 10^n. Each iteration advances 1 bit, need 1000*3=3000
+iterations. Each iteration need to check possible 1,2,3 digit choice, this can
+be done by checking all 000, 001, 002, ..., 999, for a total of 1000 choices. So
+it runs in time. 
+only the sum of digits matters.
+
+MAXMATCH, N is only 5. So for each possible subset in left, find expected value
+on the right. When N is 5, we only do this for the first 4, then the last one
+can just use accumulated value. So the time is about 100^4=10^8.
+
+POLYPAR, so many people ACed, but I have no idea what to do, except when deg=1,
+you can trivially get answer since it is only c1 * sum.
+
+HULL, didn't work much on it.

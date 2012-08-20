@@ -28,7 +28,9 @@
 // idea is to move submatrix left to right, row by row
 
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
+#include <cstring>
 using namespace std;
 
 int N, K;

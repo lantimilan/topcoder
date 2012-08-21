@@ -16,8 +16,9 @@
 // =========================================================
 
 // given NxN matrix A
-// output NxN matrix B such that B[i][j] is avg over A[i2][j2] around (i,j)
-// with KxK submatrix
+// output NxN matrix B and D
+// such that B[i][j] is sum over A[i2][j2] around (i,j)
+// with KxK submatrix, and D[i][j] is the avg over same KxK submatrix
 //
 // if K is odd, then the submatrix is (K-1)/2 x (K-1)/2
 // if K is even, then upleft is K/2 x K/2 and lowright is (K/2-1)x(K/2-1)
@@ -49,8 +50,11 @@ int get(int mat[][5005], int i, int j)
 void smooth()
 {
     assert(K>=1);
+    assert(K<=N);
     if (K==1) {
-        memcpy(B, A, sizeof A);
+        for(int i=0; i<N; ++i)
+        for(int j=0; j<N; ++j)
+            D[i][j] = B[i][j] = A[i][j];
         return;
     }
     // calc C
@@ -91,20 +95,19 @@ void smooth()
         int size = width * height;
         D[i][j] = 1.0 * B[i][j] / size;
     }
+}
 
+int main()
+{
+    scanf("%d%d", &N, &K);
+    for(int i=0; i<N; ++i)
+    for(int j=0; j<N; ++j)
+        scanf("%d", &A[i][j]);
+    smooth();
     for(int i=0; i<N; ++i) {
         for(int j=0; j<N; ++j) {
             printf("%.2f ", D[i][j]);
         }
         putchar('\n');
     }
-}
-
-int main()
-{
-    int N, K;
-    scanf("%d%d", &N, &K);
-    for(int i=0; i<N; ++i)
-    for(int j=0; j<N; ++j)
-        scanf("%d", &A[i][j]);
 }

@@ -1,3 +1,5 @@
+// SRM 552 div1
+// p250
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -76,8 +78,25 @@ public:
 //
 //6 7 7 7
 //
-//Enough pattern, so to make one triangle of N layers you need sum of 1 to N balls, which is N(N+1)/2. For N=3k or 3k+2 this number is a multiple of 3 so you need the same number of three colors, and the answer is simply B/(S/3), where R>=G>=B and S = N(N+1)/2.
+//Enough pattern, so to make one triangle of N layers you
+//need sum of 1 to N balls, which is N(N+1)/2. For N=3k or
+//3k+2 this number is a multiple of 3 so you need the same
+//number of three colors, and the answer is simply B/(S/3),
+//where R>=G>=B and S = N(N+1)/2.
 //
-//The tricky case is N=3k+1, then S = 3k' + 1. Now you need to distribute balls to make max number of triangles. Let us image that the optimal answer is m triangles, then you need at least m*((S-1)/3) for each color, and whatever remain can be any color, as long as the remaining balls are at least m. So the answer is min of (R+G+B)/S and B/(S/3). The special case is N=1, where you return R+G+B. An easier way to visualize this is that you grow three equal columns for each color, then what has been cut off from each color are the remaining balls you have, those balls are equivalent and can be distributed to any triangle you want to make.
+//The tricky case is N=3k+1, then S = 3k' + 1. Now you need
+//to distribute balls to make max number of triangles. Let
+//us image that the optimal answer is m triangles, then you
+//need at least m*((S-1)/3) for each color, and whatever
+//remain can be any color, as long as the remaining balls
+//are at least m. So the answer is min of (R+G+B)/S and
+//B/(S/3). The special case is N=1, where you return R+G+B.
+//An easier way to visualize this is that you grow three
+//equal columns for each color, then what has been cut off
+//from each color are the remaining balls you have, those
+//balls are equivalent and can be distributed to any
+//triangle you want to make.
 //
-//The problem setter is more evil than this to introduce a few integer overflow even for long long, if you use * instead of /
+//The problem setter is more evil than this to introduce a
+//few integer overflow even for long long, if you use *
+//instead of /

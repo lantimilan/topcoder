@@ -13,6 +13,12 @@
 //
 // (f[n]+f[n-1]) = 3(f[n-1] + f[n-2])
 // but how do you solve f[n]?
+//
+// OK, here is a clue
+//
+// f(n) + f(n-1) and f(n-1) + f(n-2) will give f(n) - f(n-2)
+// then you can solve for f(n) by considering even and odd n
+// separately
 
 #include <cstdio>
 using namespace std;

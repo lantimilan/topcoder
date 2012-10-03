@@ -20,39 +20,52 @@ vector<vector<int> > block;
 vector<vector<int> > avail;
 map<pii, int> mp;
 
-bool operator<(const pii &p1, const pii &p2)
-{
-    if (p1.first >=0 && p2.first < 0) return true;
-    if (p1.first >=0 && p2.first >=0) return p1.first < p2.first;
-    return false;
-}
+// to use minheap you need to reverse operator less
+class myless {
+public:
+    bool operator()(int p1, int p2)
+    {
+        if (dist[p1]<0 && dist[p2]>=0) return true;
+        if (dist[p1]>=0 && dist[p2]>=0) return dist[p1]>dist[p2];
+        return false;
+    }
+};
 
 void dijkstra(int s)
 {
     memset(dist, -1, sizeof dist);
     memset(vis, 0, sizeof vis);
     dist[s] = 0;
-    priority_queue<pii> pq;
-    pq.push(pii(dist[s], s));
+    while(mp.find(pii(s,dist[s])) != mp.end()) {
+        dist[s]++;
+    }
+    priority_queue<int, vector<int>, myless> pq;
+    pq.push(s);
     while(!pq.empty()) {
-        int topdist = pq.top().first;
-        int topnode = pq.top().second;
+        int topnode = pq.top();
+        int topdist = dist[topnode];
         pq.pop();
+        if (topnode == (int)edge.size()-1) break;
         if (vis[topnode]) continue;
         vis[topnode] = 1;
         for(int x=0; x<(int)edge[topnode].size(); ++x) {
             int next = edge[topnode][x].first;
             int dnew = topdist + edge[topnode][x].second;
-            if (dist[next]<0 || dist[next] > dnew) {
-                if (next == (int)edge.size()-1) {
-                    dist[next] = dnew;
-                }
+
+            int n = edge.size();
+            if (next == n-1) {
+                if (dist[next]<0) dist[next] = dnew;
+                else if (dist[next] > dnew) dist[next] = dnew;
+            } else {
                 if (mp.find(pii(next,dnew)) == mp.end()) {
-                    dist[next] = dnew;
+                    // do nothing
                 } else {
-                    dist[next] = mp[pii(next, dnew)];
+                    dnew = mp[pii(next, dnew)];
                 }
-                pq.push(pii(dist[next], next));
+                if (dist[next]<0 || dist[next] > dnew) {
+                    dist[next] = dnew;
+                }
+                pq.push(next);
             }
         }
     }
@@ -80,14 +93,13 @@ int main()
     avail = block;
     for(int i=0; i<n; ++i) {
         int s = block[i].size();
-        int next;
-        for(int j=0; j<s; j=next) {
-            next=j+1;
-            while(next < s && block[i][next] == block[i][next-1]+1)
-                next++;
-            int val = block[i][next-1]+1;
-            for(int x=j; x<next; ++x) {
-                avail[i][x] = val;
+        for(int j=0; j<s; ) {
+            int next=block[i][j];
+            int x = j;
+            for(++next, ++j; j<s && next == block[i][j]; ++j, ++next)
+                ;
+            for(; x<j; ++x) {
+                avail[i][x] = next;
             }
         }
     }

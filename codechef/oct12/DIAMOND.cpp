@@ -32,6 +32,7 @@
 using namespace std;
 
 int V[2005];
+double dp[2005][2005];
 
 int main()
 {
@@ -43,19 +44,25 @@ int main()
             scanf("%d", V+i);
             sum += V[i];
         }
-        double ans=0;
-        if (N==1) {
-            ans = sum;
-        } else if (N==2) {
-            ans = sum/2.0;
-        } else if (N&1) {
-            ans = sum/2.0 - (V[0]+V[N-1])/4.0;
-            ans = sum-ans;
-        } else {
-            ans = sum/2.0;
+        for(int i=0; i<=N; ++i)
+            dp[i][i] = 0;
+        for(int i=0; i<N; ++i)
+            dp[i][i+1] = V[i];
+
+        for(int l=2; l<=N; ++l)
+        for(int i=0; i+l<=N; ++i) {
+            double curr = 0;
+            int j = i+l;
+            curr += dp[i+1][j-1] + V[i];
+            curr += dp[i+1][j-1] + V[j-1];
+            curr += dp[i][j-2] + V[j-1];
+            curr += dp[i+2][j] + V[i];
+            dp[i][j] = curr / 4;
         }
+        double ans=dp[0][N];
         printf("%.3f\n", ans);
     }
 }
 
+// TLE
 // WA

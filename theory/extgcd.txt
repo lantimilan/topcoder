@@ -1,0 +1,66 @@
+This gives a proof that abs(x) <= b and abs(y) <= a.
+
+Given two positive integers a and b, the extended Euclidean
+algorithm computes x, y and d such that
+
+a*x + b*y = d
+
+we know that one of x and y must be negative or zero because
+d<=a and d<=b.
+
+Now we claim that x and y satisfy:
+abs(x) <= b
+abs(y) <=a
+where abs(.) computes absolute value.
+
+Without loss of generality we assume a>=b.
+The proof is by induction.
+
+Base case is when a%b == 0
+in this case the algorithm let x=0 and y=1 and d=b
+so we have abs(x) <=b and abs(y) <= a
+
+Suppose the claim holds for the last k steps, now we
+consider one more iteration:
+
+Let the current iteration be
+a*x + b*y = d
+
+and the previous iteration have a', b', x', y'
+
+we know that the algorithm will set
+x' = y
+y' = x - q*y
+b' = a
+a' = q * a + b
+
+Now our job is to show that
+abs(x') <= b'
+abs(y') <= a'
+
+From inductive hypothesis we have
+abs(x) <= b (*)
+abs(y) <= a (**)
+
+(**) implies abs(x') = abs(y) <= a = b'
+abs(y') = abs(x - q*y) <= abs(x) + abs(q*y)
+we know abs(x) <= b
+abs(q*y) = q*abs(y) <= q*a = q*a + b = a'
+
+So we have shown that abs(x') <= b'
+and abs(y') <= a' in one more iteration.
+And this concludes the induction proof.
+
+One example that illustrates this idea is:
+
+    a   b   x   y   q
+------------------------------------------
+   35  24  11  -16  1
+   24  11  -5   11  2
+   11   2   1   -5  5
+    2   1   0   1   2
+
+notice that we fill in this table backwards for x,y
+
+
+

@@ -38,14 +38,23 @@ int main()
 		int next;
 		int gap;
 		bool good = true;
-		for(gap = 1; s+gap < N; gap *= 2) {
+		for(gap = 1; ; gap *= 2) {
 			next = s + gap;
 			if (next >= N) { next = N-1; }
 			if (!check(s, next)) { good = false; break; }
 			if (next == N-1) break;
 		}
-		if (!good)
-			next = s + gap/2;
+		if (!good) {
+			int lo = s + gap/2, hi = s + gap;
+			while(lo <= hi) {
+				int m = (lo + hi)/2;
+				if (check(s, m)) {
+					next = m; lo = m+1;
+				} else {
+					hi = m-1;
+				}
+			}
+		}
 		assert(next > s);
 		s = next;
 	}
@@ -56,4 +65,4 @@ int main()
 		printf("%d %d\n", days[i], points[i]);
 }
 
-// Score: 0.333333 
+// Score: 0.517241 

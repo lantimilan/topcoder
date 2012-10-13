@@ -138,3 +138,5 @@ int main()
 	}
 	//printf("total cost %d\n", cost);
 }
+
+// score 0.786659 

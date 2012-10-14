@@ -1,68 +1,65 @@
-// =========================================================
-// 
-//       Filename:  DIAMOND.cpp
-// 
-//    Description:  
-// 
-//        Version:  1.0
-//        Created:  10/02/2012 11:20:32 AM
-//       Revision:  none
-//       Compiler:  g++
-// 
-//         Author:  LI YAN (lyan), lyan@cs.ucr.edu
-//        Company:  U of California Riverside
-//      Copyright:  Copyright (c) 10/02/2012, LI YAN
-// 
-// =========================================================
-
-// Let f(a,b) be expected gain with [a,b]
-// then a simple DP is
-// f(ab) = p(HH)  f(a+2,b) + v[a]
-//         p(HT)  f(a+1,b-1) + v[a]
-//         p(TH)  f(a+1,b-1) + v[b]
-//         p(TT)  f(a,b-2) + v[b]
-// However for T=500 and N=2000, this one will TLE
-//
-// linearity of expectation
-// looks for N>=3
-// second player takes left and right with p=1/4
-// and inner ones with p=1/2
+// codechef
 
 #include <cstdio>
 using namespace std;
 
-int V[2005];
-double dp[2005][2005];
+const int MAXN = 2000;
+double prob[MAXN+5][MAXN+5];
+
+void init()
+{
+	prob[0][0] = 1;
+	for(int i=1; i<MAXN; ++i) {
+		prob[i][0] += 1.0/2;
+		prob[i][i] += 1.0/2;
+		// 1/4 [l+1, r-1]
+		// 1/4 [l+2, r]
+		// 1/4 [l+1, r-1]
+		// 1/4 [l, r-2]
+		for(int j=1; j<i; ++j) {
+			prob[i][j] += 1.0/4 * prob[i-2][j-1];
+		}
+		for(int j=2; j<=i; ++j) {
+			prob[i][j] += 1.0/4 * prob[i-2][j-2];
+		}
+		for(int j=1; j<i; ++j) {
+			prob[i][j] += 1.0/4 * prob[i-2][j-1];
+		}
+		for(int j=0; j<i-1; ++j) {
+			prob[i][j] += 1.0/4 * prob[i-2][j];
+		}
+	}	
+	/*for(int i=0; i<6; ++i) {
+		double sum = 0;
+		for(int j=0; j<=i; ++j) {
+			printf("%.5lf ", prob[i][j]);
+			sum += prob[i][j];
+		}
+		printf("\tsum %.5lf", sum);
+		putchar('\n');
+	}*/		
+}
+
+void solve()
+{
+	int N; scanf("%d", &N);
+	int val[2005];
+	for(int i=0; i<N; ++i) {
+		scanf("%d", val + i);
+	}
+	double sum = 0;
+	for(int i=0; i<N; ++i) {
+		sum += prob[N-1][i] * val[i];
+	}
+	printf("%.3lf\n", sum);
+}
 
 int main()
 {
-    int T; scanf("%d", &T);
-    while(T--) {
-        int N; scanf("%d", &N);
-        int sum=0;
-        for(int i=0; i<N; ++i) {
-            scanf("%d", V+i);
-            sum += V[i];
-        }
-        for(int i=0; i<=N; ++i)
-            dp[i][i] = 0;
-        for(int i=0; i<N; ++i)
-            dp[i][i+1] = V[i];
-
-        for(int l=2; l<=N; ++l)
-        for(int i=0; i+l<=N; ++i) {
-            double curr = 0;
-            int j = i+l;
-            curr += dp[i+1][j-1] + V[i];
-            curr += dp[i+1][j-1] + V[j-1];
-            curr += dp[i][j-2] + V[j-1];
-            curr += dp[i+2][j] + V[i];
-            dp[i][j] = curr / 4;
-        }
-        double ans=dp[0][N];
-        printf("%.3f\n", ans);
-    }
+	init();
+	int T; scanf("%d", &T);
+	while(T--) solve();
 }
 
-// TLE
-// WA
+// Correct Answer 
+// Execution Time: 6.49 

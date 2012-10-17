@@ -18,17 +18,36 @@
 #include <fstream>
 using namespace std;
 
+int mylog(int n)
+{
+    int l=0;
+    while((1<<l) < n)
+        l++;
+    return l;
+}
+
 int main()
 {
     ifstream fin("input.txt");
     ofstream fout("output.txt");
     int n; fin >> n;
-    fout << n-1 << "\n";
-    for(int i=1; i<n; ++i) {
-        fout << i;
-        for(int j=1; j<=i; ++j) {
-            fout << " " << j;
+    int l = mylog(n);
+    fout << l << "\n";
+    int up = 1<<l;
+    for(int block=up/2; block > 0; block/=2) {
+        int left[1024];
+        int cnt=0;
+        int val=0;
+        for(int k=0; k<up/block; ++k) {
+            for(int x=0; x<block; ++x) {
+                ++val;
+                if (k%2==0 && val <= n)
+                    left[cnt++] = val;
+            }
         }
-        fout << "\n";
+        fout << cnt;
+        for(int i=0; i<cnt; ++i)
+            fout << " " << left[i];
+        fout << endl;
     }
 }

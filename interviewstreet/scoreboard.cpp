@@ -63,3 +63,6 @@ int main()
 // last case
 // 0 1 2 3, there are 3*3 = 9 choices since each of the three -1 can be 0, 1, 3
 // 1 1 2 2, there are 3 choice since one of the three -1 has to be 2
+//
+// dp[n][cap][sum] : number of valid sequence with n elements, each no more than
+// cap, add up to sum

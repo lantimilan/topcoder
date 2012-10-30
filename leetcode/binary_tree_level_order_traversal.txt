@@ -1,0 +1,41 @@
+/**
+ * Definition for binary tree
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int> > levelOrder(TreeNode *root) {
+        // Start typing your C/C++ solution below
+        // DO NOT write int main() function
+        if (root == NULL) return vector<vector<int> >();
+        queue<pair<TreeNode*,int> > que; // val, level        
+        que.push(make_pair(root, 0));
+        vector<vector<int> > ans;
+        int level = 0;
+        vector<int> row;
+        while(!que.empty()) {
+            TreeNode *ptr = que.front().first;
+            int curr = que.front().second;
+            que.pop();
+            if (ptr) {
+                if (ptr->left) que.push(make_pair(ptr->left, curr+1));
+                if (ptr->right) que.push(make_pair(ptr->right, curr+1));
+            }
+            if (curr > level) {
+                level = curr;
+                ans.push_back(row);
+                row.clear();
+                row.push_back(ptr->val);
+            } else {
+                row.push_back(ptr->val);
+            }            
+        }
+        ans.push_back(row);
+        return ans;
+    }
+};

@@ -1,1 +1,5 @@
 gray code: done
+implement strstr(): done, this one needs KMP, also need to check ""
+Insert interval: done.
+Integer to Roman: done.
+

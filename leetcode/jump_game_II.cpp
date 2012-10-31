@@ -3,18 +3,19 @@ public:
     int jump(int A[], int n) {
         // Start typing your C/C++ solution below
         // DO NOT write int main() function
-        if (n<=1) return 0;
-        
-        int pos = 0;
-        int last = A[pos];
-        int ans = 1;
-        while (last < n-1) {
-            int next = 0;
-            for (; pos <= last; ++pos)
-                next = max(next, pos + A[pos]);
-            last = next;
-            ans++;
+        int pos, next;
+        int cnt;
+        pos = next = 0;
+        cnt = 0;
+        // current region is [pos, next]
+        while (next < n-1) {
+            cnt++;
+            int hop = 0;
+            for (int x=pos; x <= next; ++x)
+                hop = max(hop, x + A[x]);
+            pos = next;
+            next = hop;
         }
-        return ans;
+        return cnt;
     }
 };

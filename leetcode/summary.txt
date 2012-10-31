@@ -3,3 +3,4 @@ implement strstr(): done, this one needs KMP, also need to check ""
 Insert interval: done.
 Integer to Roman: done.
 
+ZigZag Conversion: done. First down, then up-right. Edge case when nRows=1.

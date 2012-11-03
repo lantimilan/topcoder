@@ -1,38 +1,34 @@
 class Solution {
 public:
-    inline bool attack(const vector<int>& cols, int r)
-    {
+    bool attack(const vector<int> &pre, int c) {
+        int r = pre.size();
         for (int i=0; i<r; ++i) {
-            if (cols[i] == cols[r]) return true;
-            if (abs(r-i) == abs(cols[r] - cols[i])) return true;            
+            if (r - i == abs(c - pre[i])) return true;
         }
-        return false;
+        return false;            
+    }
+    void genperm(vector<int> &pre, vector<int> &rest, int &ans) {
+        if (rest.empty()) { ++ans; return; }
+        for (int i=0; i<rest.size(); ++i) {
+            if (!attack(pre, rest[i])) {
+                int n = rest.size();                
+                swap(rest[i], rest[n-1]);
+                pre.push_back(rest.back()); rest.pop_back();
+                genperm(pre, rest, ans);
+                rest.push_back(pre.back()); pre.pop_back();
+                swap(rest[i], rest[n-1]);
+            }
+        }
     }
     int totalNQueens(int n) {
-        // Start typing your C/C++ solution below        
+        // Start typing your C/C++ solution below
         // DO NOT write int main() function
         int ans = 0;
-        vector<int> cols(n, 0);
-        int r = 0;
-
-        while (r >= 0) {
-            while (cols[r] < n && attack(cols, r))
-                cols[r]++;
-            if (cols[r] >= n) {
-                cols[r] = 0;
-                r--; 
-                if (r>=0) cols[r]++;
-            } else {
-                r++;
-                if (r==n) {
-                    ans++;
-                    cols[--r]++;
-                }
-            }        
-        }
-        
+        // gen all permutations and do pruning
+        vector<int> pre, cols(n);
+        for (int i=0; i<n; ++i) cols[i] = i;
+        genperm(pre, cols, ans);  // cannot use temp like vector<int>() in place of pre
+        // because c++ thinks a temp is rval and cannot be used as lval
         return ans;
     }
 };
-
-// TLE for n=12

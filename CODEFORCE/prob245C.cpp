@@ -10,6 +10,8 @@ const int INF = 1000000;
 int coins[105];
 pii dp[105][1005];
 
+// this is heap structure so no overlap in subcases
+// simple recursion would work without dp
 pii calc(int pos, int n)
 {
     //cout << "calc " << pos << ' ' << val << endl;

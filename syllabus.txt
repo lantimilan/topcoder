@@ -1,0 +1,23 @@
+graph:
+strongly connected component
+articulation point/biconnected component
+mincost maxflow
+weighted/unweighted bipartite vertex cover
+maxflow
+
+string:
+Manacher's algorithm for palindrome
+Aho-Corasick
+suffix array
+suffix tree
+
+computational geometry:
+all nearest neighbor
+segment intersection
+convex hull
+voronoi diagram
+
+number theory:
+
+game:
+

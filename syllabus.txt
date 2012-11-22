@@ -7,6 +7,7 @@ maxflow
 
 string:
 Manacher's algorithm for palindrome
+http://tristan-interview.blogspot.com/2011/11/longest-palindrome-substring-manachers.html
 Aho-Corasick
 suffix array
 suffix tree

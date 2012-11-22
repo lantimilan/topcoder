@@ -18,6 +18,8 @@ convex hull
 voronoi diagram
 
 number theory:
+Lucas' theorem about binomial coefficients modulo prime
+Andrew Granville's generalization
 
 game:
 

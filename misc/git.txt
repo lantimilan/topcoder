@@ -1,0 +1,3 @@
+
+# show change
+$ git show --pretty="format:" --name-only bd61ad98

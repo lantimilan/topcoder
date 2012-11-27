@@ -1,4 +1,5 @@
 /* Enter your code here. Read input from STDIN. Print output to STDOUT */
+/* Enter your code here. Read input from STDIN. Print output to STDOUT */
 
 // the trajectory of a point with d1/d2 = a for (x1, y1) and (x2, y2) is a circle!
 #include <algorithm>
@@ -85,11 +86,11 @@ int main()
         cout << fixed << setprecision(2) << x4 << ' ' << y4 << endl;
     } else {
         if (r1 == r2 && xc1 == xc2 && yc1 == yc2) {
-            // two circles overlap
+            // two circles overlap            
             double xl, yl;
             xl = xc1 - r1;
             yl = yc1;
-            cout << xl << ' ' << yl << endl;
+            cout << fixed << setprecision(2) << xl << ' ' << yl << endl;
         } else {
             if (dist + r2 >= r1) {
                 // one or two sol
@@ -102,3 +103,4 @@ int main()
         }
     }
 }
+// 19/20 passed

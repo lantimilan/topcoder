@@ -82,7 +82,10 @@ int main()
     } else if (dist == r1 + r2) {
         // one sol
         double x3, y3, x4, y4;
-        intersect_circle(r1, xc1, yc1, r2, xc2, yc2, x3, y3, x4, y4);
+        if (r1 == 0) { x4 = xc1; y4 = yc1; }  // both circles are points and they coincide
+        else {
+            intersect_circle(r1, xc1, yc1, r2, xc2, yc2, x3, y3, x4, y4);
+        }
         cout << fixed << setprecision(2) << x4 << ' ' << y4 << endl;
     } else {
         if (r1 == r2 && xc1 == xc2 && yc1 == yc2) {
@@ -103,4 +106,5 @@ int main()
         }
     }
 }
-// 19/20 passed
+// fixed one issue
+// still 19/20

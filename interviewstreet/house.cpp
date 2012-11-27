@@ -13,11 +13,11 @@ void get_circle(double ratio, double x1, double y1, double x2, double y2,
                 double &radius, double &xc, double &yc)
 {
     double a2 = sqr(ratio);
-    xc = (a2*x1 - x2)/(a2-1);
-    yc = (a2*y1 - y2)/(a2-1);
+    xc = (a2*x2 - x1)/(a2-1);
+    yc = (a2*y2 - y1)/(a2-1);
     double t1, t2;
-    t1 = sqr(a2*x1-x2) - (a2-1)*(a2*x1*x1-x2*x2);
-    t2 = sqr(a2*y1-y2) - (a2-1)*(a2*y1*y1-y2*y2);
+    t1 = sqr(a2*x2-x1) - (a2-1)*(a2*x2*x2-x1*x1);
+    t2 = sqr(a2*y2-y1) - (a2-1)*(a2*y2*y2-y1*y1);
     radius = sqrt((t1+t2)/sqr(a2-1));
 }
 

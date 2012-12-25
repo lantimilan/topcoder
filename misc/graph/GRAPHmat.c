@@ -9,6 +9,13 @@ struct graph { int V; int E; int **adj; };
 // forward declaration
 int **MATRIXinit(int r, int c, int val);
 
+Edge EDGE(int v, int w)
+{
+    Edge e;
+    e.v = v; e.w = w;
+    return e;
+}
+
 Graph GRAPHinit(int V, int E)
 {
     Graph G = malloc(sizeof *G);

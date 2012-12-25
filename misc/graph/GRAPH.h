@@ -18,11 +18,4 @@ Graph GRAPHcopy(Graph);  // clone graph
 void GRAPHdestropy(Graph);  // deallocate memory
 void GRAPHshow(Graph);  // print graph
 int GRAPHcc(Graph);  // count connected components
-
-Edge EDGE(int v, int w)
-{
-    Edge e;
-    e.v = v; e.w = w;
-    return e;
-}
 #endif

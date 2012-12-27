@@ -5,3 +5,5 @@
 //
 // for each valid seq, one needs to be lcm, the rest can be
 // any divisor (including lcm itself)
+//
+// n is 10^5

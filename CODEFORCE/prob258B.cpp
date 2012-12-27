@@ -189,6 +189,8 @@ int main()
     cout << ans << endl;
 }
 
+// Accepted
+//
 // CF OJ is having issue, still in queue
 //
 // to find numbers with certain property that is less than or equal to cap

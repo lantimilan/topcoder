@@ -3,3 +3,5 @@
 // find min s[v] and connect to the max s[w] on the other part
 //
 // Use heap or BST (stl set) to get min and max and update in O(log n) time
+//
+// Correctness from induction

@@ -18,6 +18,11 @@
 //
 // Question: if row[3] and col[3] are good, does that imply all a[0..8] are good?
 // Answer: it seems they have to be, but proof?
+// No, it is false. e.g. a[0]-1 and a[2]+1 and a[3]+1 and a[5]-1 form a different
+// solution with the same row[] and col[]
+//
+// Question: we have 9! = 10^6 choices and we need to verify each choice in
+// less than O(n) for n = 10^5 time, how?
 /////////////////////////////////////////////////////////////////////
 
 #include <algorithm>

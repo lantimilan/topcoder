@@ -8,10 +8,16 @@
 // The lines are obtained by binary search
 // since x[i], y[i] are integers, we only need split lines to be in
 // integer or .5 places
+// We could mult each x[i], y[i] by 2, but then in bsearch we want odd numbers,
+// however (odd + odd) / 2 may be even, so instead
+// we make all x[i], y[i] odd and we look for even dividers, since (even + even)/2
+// is always even
+//
 //
 // time: 9! * log(10^9) = 10^6 * 30 = 10^7
 //
 // Question: if row[3] and col[3] are good, does that imply all a[0..8] are good?
+// Answer: it seems they have to be, but proof?
 /////////////////////////////////////////////////////////////////////
 
 #include <algorithm>

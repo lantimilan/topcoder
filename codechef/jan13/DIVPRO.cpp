@@ -45,6 +45,9 @@ int64 calc(frac f, int64 L)
     return ans;
 }
 
+// 0 needs to be handled specially
+// any 0 in the digits will cause result to be 0
+// but you cannot have d/0
 int main()
 {
     int T; cin >> T;

@@ -1,0 +1,26 @@
+graph:
+strongly connected component
+articulation point/biconnected component
+mincost maxflow
+weighted/unweighted bipartite vertex cover
+maxflow
+
+string:
+Manacher's algorithm for palindrome
+http://tristan-interview.blogspot.com/2011/11/longest-palindrome-substring-manachers.html
+Aho-Corasick
+suffix array
+suffix tree
+
+computational geometry:
+all nearest neighbor
+segment intersection
+convex hull
+voronoi diagram
+
+number theory:
+Lucas' theorem about binomial coefficients modulo prime
+Andrew Granville's generalization
+
+game:
+

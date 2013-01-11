@@ -162,6 +162,16 @@ int main()
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;
+        if (V==0) {
+            int even, odd;
+            odd = L/2; odd++;
+            even = L - odd;
+            ans = (mypow(10, even) - mypow(9, even));
+            if (ans <0 ) ans += M;
+            ans = ans * mypow(9, odd) & M;
+            printf("%lld\n", ans);
+            continue;
+        }
         //if (has_prime(V)) {
         int L1, L2;
         L2 = L/2; L1 = L - L2;

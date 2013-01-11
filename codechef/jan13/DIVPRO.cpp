@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
+#include <cstring>
 using namespace std;
 
 typedef long long int64;
@@ -16,6 +17,7 @@ int base[] = {2,3,5,7};
 int lim[] = {60,40,20,20};
 int64 vals[100000+50]; int K;
 int64 ways[20][100000]; // (len,val), ways to make val with len
+int lookup[100000][12]; // (i,d) = j if vals[i]/d = vals[j]
 
 void init()
 {
@@ -58,6 +60,7 @@ void init()
     //    }
     //    assert(v==1);
     //}
+
 }
 
 int get_id(int64 target)
@@ -85,6 +88,27 @@ int get_lower(int64 a[], int n, int64 target)
     return l;
 }
 
+void init_table()
+{
+    puts("enter init table");
+    // init lookup[i][d]
+    memset(lookup, -1, sizeof lookup);
+    for (int i=0; i<K; ++i)
+    {
+        int v = vals[i];
+        lookup[i][1] = i;
+        for (int d=2; d<10; ++d)
+        {
+            if (v % d == 0) {
+                int id = get_id(v/d);
+                if (id >= 0)
+                    lookup[i][d] = id;
+            }
+        }
+    }
+    puts("done init table");
+}
+
 void count_ways()
 {
     const int L=18;
@@ -96,7 +120,8 @@ void count_ways()
     int64 val = vals[x];
     for (int d=1; d<=9; ++d) if (val % d == 0)
     {
-        int id = get_id(val/d);
+        //int id = get_id(val/d); // use lookup[i][d] table to speed up
+        int id = lookup[x][d];
         if (id >= 0) {
             ans += ways[len-1][id];
             ans &= M;
@@ -142,23 +167,22 @@ void factorize(int64 a, int c[])
 
 int main()
 {
-    init();
+    init(); init_table();
     count_ways();
     int T;
     int L;
     int64 V;
     scanf("%d", &T);
-    // rememberto add code for V=0
     /*
-    while (T--) {
+    while (T--) {  // for T=320,000, takes 0.3s to do I/O
         scanf("%d %lld", &L, &V);
         printf("%d %lld\n", L, V);
         if (get_id(V) >= 0) {
             int64 cap = mypow(9,(L+1)/2);
             L /= 2;
         }
-    }  // this takes only 1.530s
-    */
+    }  
+    return 0;  */
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;

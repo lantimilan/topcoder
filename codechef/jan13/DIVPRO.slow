@@ -1,0 +1,126 @@
+// more ideas:
+// can form the number with ceil(L/2) / floor(L/2)
+// order does not matter
+//
+// if V=0, even = ceil(L/2), odd = floor(L/2)
+// ans = (10^(even-1) - 9^(even-1)) * 9^(odd+1) because no leading 0 allowed
+//
+// else use dp
+// optimization:
+// 1. use bit mask to do mod
+// 2. create small lookup table for L<=5, then only V<=99999 is possible
+// 3. num and deno can have 2,3,5,7 only, no other prime factors
+
+#include <cstdio>
+#include <iostream>
+#include <map>
+using namespace std;
+
+typedef long long int64;
+typedef pair<int64,int64> pii;
+
+const int64 M = (1LL<<32)-1;
+map<pii, int64> memo[20];  // len, (num,deno)
+int small[10][300][300];  // 9*9*9
+
+bool has_prime(int64 a)
+{
+    while (a%2 == 0) a/=2;
+    while (a%3 == 0) a/=3;
+    while (a%5 == 0) a/=5;
+    while (a%7 == 0) a/=7;
+    return a==1;
+}
+
+int64 gcd(int64 a, int64 b)
+{
+    return b==0?a:gcd(b,a%b);
+}
+
+void init()
+{
+    for (int i=1; i<(int)1e6; ++i) {
+        int len=0;
+        int k = i;
+        int d[10];
+        bool good = true;
+        while (k) {
+            if (k%10 == 0) { good = false; break; }
+            d[len++] = k%10;
+            k/=10;
+        }
+        if (good) {
+            int num=1, deno=1, g;
+            for (int i=0; i<len; i+=2) num *= d[i];
+            for (int i=1; i<len; i+=2) deno *= d[i];
+            g = gcd(num, deno);
+            num /= g; deno /= g;
+            small[len][num][deno]++;
+        }
+    }
+}
+
+int64 calc(int len, pii frac)
+{
+    int64 num, deno, ans=0;
+    int64 g1, g2;
+    num = frac.first; deno = frac.second;
+    if (!has_prime(num) && !has_prime(deno)) return 0;
+    //if (len==1) return deno==1 && 1 <= num && num <= 9;
+    if (len <= 6) {
+        if (num < 300 && deno < 300)
+            return small[len][num][deno];
+        else
+            return 0;
+    }
+    if (memo[len].find(frac) != memo[len].end())
+        return memo[len][frac];
+    for (int d=1; d<=9; ++d) {  // try all possible last digit
+        g1 = gcd(d, num);
+        g2 = gcd(d, deno);
+        pii next = frac;
+        if (len &1) {
+            next.first /= g1;
+            next.second *= d/g1;
+        } else {
+            next.first *= d/g2;
+            next.second /= g2;
+        }
+        ans += calc(len-1, next);
+        ans &= M;
+    }
+    return memo[len][frac] = ans;
+}
+
+int64 mypow(int a, int n)
+{
+    int64 ans = 1;
+    for (int i=0; i<n; ++i)
+        ans = ans * a & M;
+    return ans;
+}
+
+int main()
+{
+    init();
+    int T; scanf("%d", &T);//cin >> T;
+    int L;
+    int64 V, ans;
+    while (T--) {
+        //cin >> L >> V;
+        scanf("%d %lld", &L, &V);
+        if (V==0) {
+            int even, odd;
+            odd = L/2; odd++;
+            even = L - odd;
+            ans = (mypow(10, even) - mypow(9, even));
+            if (ans <0 ) ans += M;
+            ans = ans * mypow(9, odd) & M;
+        } else {
+            ans = calc(L, make_pair(V, 1));
+        }
+        //cout << ans << endl;
+        printf("%lld\n", ans);
+    }
+}
+

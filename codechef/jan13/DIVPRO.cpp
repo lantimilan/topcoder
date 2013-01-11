@@ -16,7 +16,6 @@ int base[] = {2,3,5,7};
 int lim[] = {60,40,20,20};
 int64 vals[100000+50]; int K;
 int64 ways[20][100000]; // (len,val), ways to make val with len
-int64 sums[20][100000];
 
 void init()
 {
@@ -24,18 +23,18 @@ void init()
     int s[4];
     int64 p[4];
     int64 prod = 1;
-    for (s[0]=0, p[0]=1; s[0] < lim[0]; s[0]++, p[0] *= base[0])
+    for (s[0]=0, p[0]=1; s[0] <= lim[0]; s[0]++, p[0] *= base[0])
     {
     prod = p[0];
-    for (s[1]=0, p[1]=1; s[1] < lim[1]; s[1]++, p[1] *= base[1])
+    for (s[1]=0, p[1]=1; s[1] <= lim[1]; s[1]++, p[1] *= base[1])
     {
     if (prod > UPP/p[1]) continue;
     prod *= p[1];
-    for (s[2]=0, p[2]=1; s[2] < lim[2]; s[2]++, p[2] *= base[2])
+    for (s[2]=0, p[2]=1; s[2] <= lim[2]; s[2]++, p[2] *= base[2])
     {
     if (prod > UPP/p[2]) continue;
     prod *= p[2];
-    for (s[3]=0, p[3]=1; s[3] < lim[3]; s[3]++, p[3] *= base[3])
+    for (s[3]=0, p[3]=1; s[3] <= lim[3]; s[3]++, p[3] *= base[3])
     {
     if (prod > UPP/p[3]) continue;
     prod *= p[3];
@@ -49,16 +48,16 @@ void init()
     }
     printf("K %d\n", K);
     sort(vals, vals+K);
-    for (int i=0; i<20; ++i) printf("%lld ", vals[i]); putchar('\n');
-    for (int i=0; i<10; ++i) printf("%lld ", vals[K-1-i]); puts("");
+    //for (int i=0; i<20; ++i) printf("%lld ", vals[i]); putchar('\n');
+    //for (int i=0; i<10; ++i) printf("%lld ", vals[K-1-i]); puts("");
     // validate only prime factors are 2,3,5,7
-    for (int i=0; i<K; ++i) {
-        int64 v = vals[i];
-        for (int x=0; x<4; ++x) {
-            while (v && v%base[x] == 0) v/=base[x];
-        }
-        assert(v==1);
-    }
+    //for (int i=0; i<K; ++i) {
+    //    int64 v = vals[i];
+    //    for (int x=0; x<4; ++x) {
+    //        while (v && v%base[x] == 0) v/=base[x];
+    //    }
+    //    assert(v==1);
+    //}
 }
 
 int get_id(int64 target)
@@ -105,10 +104,6 @@ void count_ways()
     }
     ways[len][x] = ans;
     }
-    int len = 2;
-    for (int x=0; x<20; ++x) {
-        printf("count_ways: %lld %d %lld\n", vals[x], len, ways[len][x]);
-    }
 }
 
 int64 mypow(int base, int n)
@@ -124,6 +119,27 @@ int64 gcd(int64 a, int64 b)
     return b==0 ? a : gcd(b, a%b);
 }
 
+bool has_prime(int64 a)
+{
+    int base[] = {2,3,5,7};
+    for (int x=0; x<4; ++x) {
+        while (a % base[x] == 0)
+            a /= base[x];
+    }
+    return a == 1LL;
+}
+
+void factorize(int64 a, int c[])
+{
+    int64 b = a;
+    int base[] = {2,3,5,7};
+    for (int x=0; x<4; ++x) {
+        while (a%base[x] == 0)
+            a/=base[x], c[x]++;
+    }
+    //printf("%lld = 2^%d * 3^%d * 5^%d * 7^%d * %lld\n", b, c[0],c[1],c[2],c[3],a);
+}
+
 int main()
 {
     init();
@@ -132,33 +148,35 @@ int main()
     int L;
     int64 V;
     scanf("%d", &T);
+    // rememberto add code for V=0
+    while (T--) {
+        scanf("%d %lld", &L, &V);
+        printf("%d %lld\n", L, V);
+        if (get_id(V) >= 0) {
+            int64 cap = mypow(9,(L+1)/2);
+            L /= 2;
+        }
+    }  // this takes only 1.530s
+    /*
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;
-        int cap;
-        if (L&1) cap = 9;
-        else cap = 1;
-
-        L /= 2;
-        printf("cap %d L %d\n", cap, L);
-        for (int m=1; m<=cap; ++m) {
-            int g = gcd(V, m);
-            int64 t = mypow(9,L)/(V/g);
-            if (t < 1) continue;
-            int x = get_lower(vals, K, t);
-            printf("t %lld val[%d] %lld\n", t, x, vals[x]);
-            assert(x>=0);
+        //if (has_prime(V)) {
+        if (get_id(V) >= 0) {
+            int64 cap = mypow(9,(L+1)/2);
+            L /= 2;
             for (int x=0; ; ++x) {
-                int64 up = vals[x] * V;
-                if (up > mypow(9,L)) break;
+                if (cap / V < vals[x]) break;
+                int64 up = vals[x] * V; assert(has_prime(up));
                 int id = get_id(up);
-                if (id>=0) {
+                if (id >= 0)
+                {
                     ans += (ways[L][id] * ways[L][x] & M);
                     ans &= M;
                 }
             }
-            //ans += ways[L][x];
         }
         printf("%lld\n", ans);
     }
+    */
 }

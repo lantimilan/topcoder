@@ -183,6 +183,11 @@ int main()
         }
     }  
     return 0;  */
+
+
+    // only K=60000 possible values of V
+    // and only 36 values of L
+    // precompute?
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;

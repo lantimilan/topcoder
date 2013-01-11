@@ -149,6 +149,7 @@ int main()
     int64 V;
     scanf("%d", &T);
     // rememberto add code for V=0
+    /*
     while (T--) {
         scanf("%d %lld", &L, &V);
         printf("%d %lld\n", L, V);
@@ -157,7 +158,7 @@ int main()
             L /= 2;
         }
     }  // this takes only 1.530s
-    /*
+    */
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;
@@ -165,7 +166,7 @@ int main()
         if (get_id(V) >= 0) {
             int64 cap = mypow(9,(L+1)/2);
             L /= 2;
-            for (int x=0; ; ++x) {
+            for (int x=0; x<20; ++x) {
                 if (cap / V < vals[x]) break;
                 int64 up = vals[x] * V; assert(has_prime(up));
                 int id = get_id(up);
@@ -178,5 +179,4 @@ int main()
         }
         printf("%lld\n", ans);
     }
-    */
 }

@@ -188,10 +188,13 @@ int main()
     // only K=60000 possible values of V
     // and only 36 values of L
     // precompute?
-    // for i<10 need 1.4s
-    // for i<100 need 7s
+    // time ./a.out >large.out
+    //
+    // 1m48.800s
+    /* cheating by precompute and read from disk
+     */
     for (L=1; L<=36; ++L)
-    for (int i=0; i<100; ++i)
+    for (int i=0; i<K; ++i)
     {
         V = vals[i];
         int L1, L2;
@@ -209,6 +212,8 @@ int main()
                 }
             }
         sol[L][i] = ans;
+        if (ans > 0)
+            printf("%d %d %lld\n", L, i, ans);
     }
     return 0;
     //

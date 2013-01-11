@@ -18,6 +18,7 @@ int lim[] = {60,40,20,20};
 int64 vals[100000+50]; int K;
 int64 ways[20][100000]; // (len,val), ways to make val with len
 int lookup[100000][12]; // (i,d) = j if vals[i]/d = vals[j]
+int64 sol[40][100000];
 
 void init()
 {
@@ -172,7 +173,6 @@ int main()
     int T;
     int L;
     int64 V;
-    scanf("%d", &T);
     /*
     while (T--) {  // for T=320,000, takes 0.3s to do I/O
         scanf("%d %lld", &L, &V);
@@ -188,6 +188,32 @@ int main()
     // only K=60000 possible values of V
     // and only 36 values of L
     // precompute?
+    // for i<10 need 1.4s
+    // for i<100 need 7s
+    for (L=1; L<=36; ++L)
+    for (int i=0; i<100; ++i)
+    {
+        V = vals[i];
+        int L1, L2;
+        int64 ans=0;
+        L2 = L/2; L1 = L - L2;
+            int64 cap = mypow(9,L1);
+            for (int x=0; ; ++x) {
+                if (cap / V < vals[x]) break;
+                int64 up = vals[x] * V;
+                int id = get_id(up);
+                if (id >= 0)
+                {
+                    ans += (ways[L1][id] * ways[L2][x] & M);
+                    ans &= M;
+                }
+            }
+        sol[L][i] = ans;
+    }
+    return 0;
+    //
+    //
+    scanf("%d", &T);
     while (T--) {
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;

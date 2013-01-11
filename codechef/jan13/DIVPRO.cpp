@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdio>
-#include <map>
 using namespace std;
 
 typedef long long int64;
@@ -13,16 +12,15 @@ const int64 M = (1LL<<32)-1;
 
 // use &M for mod
 
-typedef pair<int64,int64> pii;
 int base[] = {2,3,5,7};
 int lim[] = {60,40,20,20};
-int64 vals[1000000+50]; int K;
-map<pii, int64> ways; // (len,val), ways to make val with len
-map<pii, int64> sums;
+int64 vals[100000+50]; int K;
+int64 ways[20][100000]; // (len,val), ways to make val with len
+int64 sums[20][100000];
 
 void init()
 {
-    const int64 UPP = 1e18;
+    const int64 UPP = (int64)1e18;
     int s[4];
     int64 p[4];
     int64 prod = 1;
@@ -31,15 +29,15 @@ void init()
     prod = p[0];
     for (s[1]=0, p[1]=1; s[1] < lim[1]; s[1]++, p[1] *= base[1])
     {
-    if (prod >= UPP/p[1]) continue;
+    if (prod > UPP/p[1]) continue;
     prod *= p[1];
     for (s[2]=0, p[2]=1; s[2] < lim[2]; s[2]++, p[2] *= base[2])
     {
-    if (prod >= UPP/p[2]) continue;
+    if (prod > UPP/p[2]) continue;
     prod *= p[2];
     for (s[3]=0, p[3]=1; s[3] < lim[3]; s[3]++, p[3] *= base[3])
     {
-    if (prod >= UPP/p[3]) continue;
+    if (prod > UPP/p[3]) continue;
     prod *= p[3];
     vals[K++] = prod;
     prod /= p[3];
@@ -63,38 +61,74 @@ void init()
     }
 }
 
+int get_id(int64 target)
+{
+    int l=0, r=K;
+    while (l<r) {
+        int m = (l+r)/2;
+        if (vals[m] < target) l = m+1;
+        else if (vals[m] > target) r = m;
+        else return m;
+    }
+    return -1;
+}
+
+// return lower_bound
+int get_lower(int64 a[], int n, int64 target)
+{
+    int l=-1, r=n; // invariant a[l] <= t and t < a[r]
+    while (l+1 < r) {
+        int m = (l+r)/2;
+        if (a[m] <= target) l = m;
+        else r = m;
+    }
+    assert(l+1 == r);
+    return l;
+}
+
 void count_ways()
 {
     const int L=18;
-    ways[pii(0LL,1LL)] = 1;
+    ways[0][0] = 1;
     for (int len=1; len<=L; ++len)
     for (int x=0; x<K; ++x)
     {
     int64 ans = 0;
     int64 val = vals[x];
-    //printf("len %d val %lld\n", len, val);
     for (int d=1; d<=9; ++d) if (val % d == 0)
     {
-        //ans += ways[pii(len-1,val/d)];  // map is slow
-        ans &= M;
+        int id = get_id(val/d);
+        if (id >= 0) {
+            ans += ways[len-1][id];
+            ans &= M;
+        }
     }
-    //ways[pii(len,val)] = ans;
+    ways[len][x] = ans;
     }
-    /*
     for (int len=1; len <= L; ++len)
     {
     for (int x=0; x<K; ++x)
     {
-        pii mykey = pii(len, vals[x]);
-        if (x == 0) sums[mykey] = ways[mykey];
+        if (x == 0) sums[len][x] = ways[len][x];
         else {
-            int64 t = sums[pii(len, vals[x-1])] + ways[mykey];
+            int64 t = sums[len][x-1] + ways[len][x];
             t &= M;
-            sums[mykey] = t;
+            sums[len][x] = t;
         }
     }
     }
-    */
+    int len = 1;
+    for (int x=0; x<10; ++x) {
+        printf("count_ways: %lld %d %lld\n", vals[x], len, ways[len][x]);
+    }
+}
+
+int64 mypow(int base, int n)
+{
+    int64 ans = 1;
+    for (int i=0; i<n; ++i)
+        ans *= base;
+    return ans;
 }
 
 
@@ -102,4 +136,26 @@ int main()
 {
     init();
     count_ways();
+    int T;
+    int L;
+    int64 V;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
+        int64 ans=0;
+        int cap;
+        if (L&1) cap = 9;
+        else cap = 1;
+
+        L /= 2;
+        for (int m=1; m<=cap; ++m) if (V%m == 0){
+            int64 t = mypow(9,L)/(V/m);
+            if (t < 1) continue;
+            int x = get_lower(vals, K, t);
+            printf("x %d, t %lld, ways %lld\n", x, t, sums[L][x]);
+            assert(x>=0);
+            ans += sums[L][x];
+        }
+        printf("%lld\n", ans);
+    }
 }

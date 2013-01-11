@@ -131,7 +131,7 @@ bool has_prime(int64 a)
 
 void factorize(int64 a, int c[])
 {
-    int64 b = a;
+    //int64 b = a;
     int base[] = {2,3,5,7};
     for (int x=0; x<4; ++x) {
         while (a%base[x] == 0)
@@ -163,16 +163,17 @@ int main()
         scanf("%d %lld", &L, &V); printf("%d %lld\n", L, V);
         int64 ans=0;
         //if (has_prime(V)) {
+        int L1, L2;
+        L2 = L/2; L1 = L - L2;
         if (get_id(V) >= 0) {
-            int64 cap = mypow(9,(L+1)/2);
-            L /= 2;
-            for (int x=0; x<20; ++x) {
+            int64 cap = mypow(9,L1);
+            for (int x=0; ; ++x) {
                 if (cap / V < vals[x]) break;
                 int64 up = vals[x] * V; assert(has_prime(up));
                 int id = get_id(up);
                 if (id >= 0)
                 {
-                    ans += (ways[L][id] * ways[L][x] & M);
+                    ans += (ways[L1][id] * ways[L2][x] & M);
                     ans &= M;
                 }
             }

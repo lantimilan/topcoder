@@ -37,7 +37,8 @@ long long countDesigns(int n, vector <int> p1, vector <int> p2)
         for (int x=0; x<3; ++x) {
             int b1 = a[x], b2 = a[(x+1)%3];
             for (int i=0; i<m; ++i)
-                if (p1[i] == b1 && p2[i] == b2) edge[x] = 1;
+                if (p1[i] == b1 && p2[i] == b2
+                	|| p1[i] == b2 && p2[i] == b1) edge[x] = 1;
         }
         ans += edge[0] && edge[1] && edge[2];
     }

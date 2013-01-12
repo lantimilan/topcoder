@@ -193,8 +193,9 @@ int main()
     // 1m48.800s
     /* cheating by precompute and read from disk
      */
-    for (L=1; L<=36; ++L)
     for (int i=0; i<K; ++i)
+    {
+    for (L=1; L<=36; ++L)
     {
         V = vals[i];
         int L1, L2;
@@ -212,8 +213,9 @@ int main()
                 }
             }
         sol[L][i] = ans;
-        if (ans > 0)
-            printf("%d %d %lld\n", L, i, ans);
+        printf("%lld ", ans);
+    }
+    putchar('\n');
     }
     return 0;
     //

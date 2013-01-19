@@ -1,0 +1,109 @@
+// the key is to recognize the intervals with [1,i]
+//
+// [i,j] even means [1,i-1] eq [1,j]
+// [i,j] odd means  [1,i-1] neq [1,j]
+//
+// disjoint set union
+// maintain eq class
+// non-eq edge implies bipartite graph
+
+#include <iostream>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+using namespace std;
+
+typedef pair<int,int> pii;
+
+map<int,int> lookup;
+
+int pa[5005];
+int myrank[5005];
+set<int> adj[5005];
+int vis[5005];
+int side[5005]; // 0 or 1, L or R
+pii edge[5005];
+int E;
+int N, K;
+
+int myfind(int p)
+{
+    while (p != pa[p]) p = pa[p];
+    return p;
+}
+
+bool dfs(int s, int parity)
+{
+    s = myfind(s);
+    if (vis[s]) return true;
+    vis[s] = 1;
+    side[s] = parity;
+    for (set<int>::iterator it = adj[s].begin();
+        it != adj[s].end(); ++it) {
+            int b = *it; b = myfind(b);
+            if (!vis[b]) { 
+                bool good = dfs(b, 1-parity);
+                if (!good) return false;
+            }
+            if (side[s] == side[b]) return false;
+    }
+    return true;
+}
+
+void solve()
+{
+    int i, j;
+    int cnt = 0;
+    int ans = -1;
+    string par;
+    int x, t;
+    for (x=0; x<5000; ++x)
+        pa[x] = x, myrank[x] = 0;
+        
+    lookup.clear();
+    E = 0;
+    for (x=0; x<K; ++x) {
+        cin >> i >> j >> par;
+        if (i < 0 || j > N) { if (ans == -1) ans = x; }
+        --i;
+        if (!lookup.count(i)) lookup[i] = cnt++;
+        if (!lookup.count(j)) lookup[j] = cnt++;
+        int a, b; a = lookup[i]; b = lookup[j];
+        int p1, p2;
+        if (par == "odd") {
+            edge[E++] = pii(a,b);
+        } else {
+            p1 = myfind(a); p2 = myfind(b);
+            if (p1 != p2) {  // union by rank
+                if (myrank[p1] == myrank[p2]) {
+                    pa[p2] = p1; myrank[p1]++;
+                } else if (myrank[p1] < myrank[p2]) {
+                    pa[p1] = p2;
+                } else { pa[p2] = p1; }
+            }
+        }
+        // bipartite
+        bool good = true;
+        for (int t=0; t<cnt; ++t) { side[t] = -1; adj[t].clear(); vis[t] = 0; }
+        for (int t=0; t<E; ++t) {
+            int a, b; a = edge[t].first; b = edge[t].second;
+            a = myfind(a); b = myfind(b);
+            if (a==b) { good = false; break; }
+            adj[a].insert(b); adj[b].insert(a);
+        }
+        if (good) good = dfs(0, 0);
+        if (!good) { if (ans == -1) ans = x; }
+    }
+    if (ans == -1) ans = K;
+    cout << ans << endl;
+}
+
+int main()
+{
+    while (cin >> N) {
+        if (N < 0) break;
+        cin >> K;
+        solve();
+    }
+}

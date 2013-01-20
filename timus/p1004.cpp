@@ -1,21 +1,34 @@
-// all pair shortest path
-// Floyd-Warshall
+// for each pair (i, j)
+// cut edge and do Dijkstra
 
+#include <cassert>
+#include <cstring>
 #include <iostream>
 #include <iomanip>
 using namespace std;
 
 int edge[105][105];
-int dist[105][105];
-int split[105][105];
+int dist[105];
+int done[105];
+int pred[105];
+int final[105];
 int N, M;
 
-void print(int s, int t)
+void dijkstra(int s)
 {
-    int k = split[s][t];
-    if (k==-1) cout << s << ' ';
-    print(s, k); cout << ' ';
-    print(k, t);
+    for (int i=0; i<N; ++i) { dist[i] = -1; done[i] = 0; }
+    dist[s] = 0; pred[s] = s;
+    for (int x=0; x<N; ++x) {
+        s = -1;
+        for (int k=0; k<N; ++k) if (!done[k] && dist[k] >= 0)
+            if (s==-1 || dist[k] < dist[s]) s = k;
+        if (s < 0) return;
+        done[s] = 1;
+        for (int j=0; j<N; ++j) if (!done[j] && edge[s][j]) {
+            int d = dist[s] + edge[s][j];
+            if (dist[j] == -1 || dist[j] > d)  { dist[j] = d; pred[j] = s; }
+        }
+    }
 }
 
 int main()
@@ -24,9 +37,7 @@ int main()
         // all input edge is positive length
         for (int i=0; i<N; ++i)
         for (int j=0; j<N; ++j) {
-            dist[i][j] = dist[j][i] = 0;
             edge[i][j] = edge[j][i] = 0;
-            split[i][j] = split[j][i] = -1;
         }
         cin >> M;
         for (int i=0; i<M; ++i) {
@@ -34,60 +45,31 @@ int main()
             if (edge[a][b] == 0 || edge[a][b] > len)
                 edge[a][b] = edge[b][a] = len;
         }
-        for (int i=0; i<N; ++i)
-        {
-        for (int j=0; j<N; ++j) cout << setw(4) << edge[i][j] << ' ';
-        cout << endl;
+        int best = -1, last;
+        for (int s=0; s<N; ++s)
+        for (int t=s+1; t<N; ++t) if (edge[s][t]) {
+            int val = edge[s][t];
+            edge[s][t] = edge[t][s] = 0;
+            dijkstra(s);
+            if (dist[t] >= 0) {
+                int cost = dist[t] + val;
+                if (best == -1 || best > cost) {
+                    best = cost; last = t;
+                    memcpy(final, pred, sizeof pred);
+                }
+            }
+            edge[s][t] = edge[t][s] = val;
         }
-
-        for (int k=0; k<N; ++k)
-        for (int i=0; i<N; ++i) if (i!=k)
-        for (int j=i+1; j<N; ++j) if (j!=k)
-        if (edge[i][k] > 0 && edge[k][j] > 0)
-        {
-            int cost = edge[i][k] + edge[k][j];
-            if (dist[i][j] == 0 || dist[i][j] > cost) {
-                dist[i][j] = dist[j][i] = cost;
-                split[i][j] = split[j][i] = k;
+        if (best == -1) cout << "No solution." << endl;
+        else {
+            while (last != final[last]) {
+                cout << last+1 << ' ';
+                last = final[last];
             }
-        }
-        for (int k=0; k<N; ++k)
-        for (int i=0; i<N; ++i) if (i!=k)
-        for (int j=i+1; j<N; ++j) if (j!=k)
-        {
-            int update = -1;
-            int cost;
-            if (dist[i][k] > 0 && dist[k][j] > 0) {
-                cost = dist[i][k] + dist[k][j];
-                if (update == -1 || update > cost) { update = cost; }
-            }
-            if (dist[i][k] > 0 && edge[k][j] > 0) {
-                cost = dist[i][k] + edge[k][j];
-                if (update == -1 || update > cost) { update = cost; }
-            }
-            if (edge[i][k] > 0 && dist[k][j] > 0) {
-                cost = edge[i][k] + edge[k][j];
-                if (update == -1 || update > cost) { update = cost; }
-            }
-            if (update != -1) {
-                dist[i][j] = dist[j][i] = update;
-                split[i][j] = split[j][i] = k;
-            }
-        }
-        int best = -1, s, t;
-        for (int i=0; i<N; ++i)
-        for (int j=i+1; j<N; ++j) if (dist[i][j] > 0 && edge[i][j] > 0)
-        {
-            int cost = dist[i][j] + edge[i][j];
-            if (best < 0 || best > cost) {
-                best = cost; s = i; t = j;
-            }
-        }
-        cout << best << ' ' << s+1 << ' ' << t+1 << split[s][t]+1 << endl;
-        if (best == -1) cout << best << endl;
-        else {  // print route
-            print(s, t);
-            cout << endl;
+            cout << last+1 << endl;
         }
     }
 }
+
+// 4729959  13:25:09 20 Jan 2013
+// lantimilan  1004. Sightseeing Trip  C++ Accepted    0.734   264 KB

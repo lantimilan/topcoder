@@ -1,3 +1,17 @@
+01/25/2013
+----------------------------------------------------------------------
+latex \subcaption[b]{this is a caption}
+to align subtables bottom
+
+\subfigure, \subfig are all deprecated, use \subcaption instead.
+
+wiki book is a good resource for latex.
+
+Start slides!
+
+timus 1010 AC. A simple problem but why do I get stuck in convex hull.
+And abs(int) is not the same as llabs(long long).
+
 01/23/2013
 ----------------------------------------------------------------------
 ampl: show dual variables

@@ -1,5 +1,19 @@
-01/22/2013
+01/23/2013
+----------------------------------------------------------------------
+ampl: show dual variables
 
+The command "display constraint_name" is sufficient to display the dual
+values.
+
+Also the command "display _conname, _con.dual;" or "display _conname, _con;"
+will display one big table of all the constraint duals.
+
+emacs: reload .emacs
+M-x load-file
+~/.emacs
+
+01/22/2013
+----------------------------------------------------------------------
 Set up kawigiEdit for topcoder, a few months back I was typing kawagi
 for no particular reason.
 

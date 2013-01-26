@@ -1,3 +1,24 @@
+01/26/2013
+----------------------------------------------------------------------
+http://piotrkazmierczak.com/2010/05/13/emacs-as-the-ultimate-latex-editor/
+http://piotrkazmierczak.com/2012/12/27/previewing-latex-symbols-without-preview-latex/
+auctex:
+    automatic formatting of a section: C-c C-q C-s;
+    section preview: C-c C-p C-s; (see the screenshot on the right)
+
+Flymake is one of those packages. It enables Emacs to check the syntax
+of your TeX file on-the-fly. To turn it on, put the following code in
+your $HOME/.emacs:
+
+(require 'flymake)
+
+(defun flymake-get-tex-args (file-name)
+(list "pdflatex"
+(list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
+
+(add-hook 'LaTeX-mode-hook 'flymake-mode)
+
+
 01/25/2013
 ----------------------------------------------------------------------
 latex \subcaption[b]{this is a caption}

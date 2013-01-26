@@ -1,5 +1,7 @@
 01/26/2013
 ----------------------------------------------------------------------
+emacs buffer text font: C-x C-+
+
 http://piotrkazmierczak.com/2010/05/13/emacs-as-the-ultimate-latex-editor/
 http://piotrkazmierczak.com/2012/12/27/previewing-latex-symbols-without-preview-latex/
 auctex:

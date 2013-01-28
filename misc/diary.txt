@@ -1,3 +1,36 @@
+01/28/2013
+----------------------------------------------------------------------
+Start using tikz/pgm for drawing diagrams. Really neat, and not too
+hard to pick up. Remind me of the old days using pstricks. I am more
+inclined to programmable drawing.
+
+use minipage can give you side by side figure/table/anything, but the
+two minipage have to be adjacent. That is,
+\begin{minipage}
+...
+\end{minipage}
+%% no blank here, or they will not be treated as consecutive minipages
+\begin{minipage}
+...
+\end{minipage}
+
+Solved 1011 of timus OJ, everybody knows 0.1 cannot be represented
+exactly in binary, but people often get surprised when read in .535 as
+double then output shows .5349999. I sort of know this problem when
+read input as string, the amusing bug I had was to append each number
+to .xx, two digits after decimal. My code actually append as many
+digits as the number of digits already there after decimal point. For
+example, 13.1 become 13.10 and for 14 I have special code to append
+".00". I never tested 13.11, this will give 13.1100 and I want 13.11 !
+In a random test I use 99.98 and found the bug.
+
+Facebook hackercup, problem C, my code is actually correct, but it
+runs more than 1m for the hardest input, and I lost faith half way and
+killed the process. So not enough time to submit the correct output
+but assembled one instead. The lesson: Use some large input to verify
+code before attempt submission. And for n=10^5, set insertion/deletion
+can take up to 1min.
+
 01/26/2013
 ----------------------------------------------------------------------
 emacs buffer text font: C-x C-+

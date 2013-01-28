@@ -1,5 +1,15 @@
 01/28/2013
 ----------------------------------------------------------------------
+yelp engineering:
+		 matching city records (legal entity of business) to
+		 yelp records, restaurant names. A machine learning
+		 problem using features, address, name, business type
+		 and so on. Similar problem in bibiliography, matching
+		 author names in different articles.
+
+
+01/27/2013
+----------------------------------------------------------------------
 Start using tikz/pgm for drawing diagrams. Really neat, and not too
 hard to pick up. Remind me of the old days using pstricks. I am more
 inclined to programmable drawing.

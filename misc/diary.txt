@@ -1,5 +1,8 @@
 01/28/2013
 ----------------------------------------------------------------------
+Got an email from SAP labs, now they are contacting those low rank
+contestants, do I respond?
+
 Algorithm problem:
 Given s1=[a-z], s2=[a-z*?], where * can match any substring (including
 empty string), and ? matches exactly one char. Check whether s2

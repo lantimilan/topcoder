@@ -1,5 +1,21 @@
 01/28/2013
 ----------------------------------------------------------------------
+Algorithm problem:
+Given s1=[a-z], s2=[a-z*?], where * can match any substring (including
+empty string), and ? matches exactly one char. Check whether s2
+matches s1.
+
+Soln 1: dp[i][j] is true iff s1[i..n) matches s2[j..m)
+each entry can take O(n) to compute as one * in s2[j] can match
+s1[i..p) for any p=i..n. This is O(n^3).
+
+Soln 2: Without loss of generality we can assume s2 is *...*...* since
+we can trim the prefix and suffix. Now our job is to match the
+non-star parts to the earliest s1 segment. This match can be done in
+O(n+m) time using KMP for each of the m pattern segments in
+s2. Overall it is O(n^2) time.
+
+
 yelp engineering:
 		 matching city records (legal entity of business) to
 		 yelp records, restaurant names. A machine learning

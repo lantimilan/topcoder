@@ -1,3 +1,10 @@
+01/31/2013
+----------------------------------------------------------------------
+Plan for job search group:
+- reservior sampling
+- prod_a[i] / a[k]
+- p and 1-p to generate 0.5
+
 01/28/2013
 ----------------------------------------------------------------------
 Got an email from SAP labs, now they are contacting those low rank

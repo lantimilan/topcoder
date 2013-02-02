@@ -275,7 +275,7 @@ void bigint::lshift(vector<int> &v, int p)
 // test code
 int main()
 {
-    vector<int> a(4, 123456789), b(4, 987654321);
+    vector<int> a(10, 123456789), b(10, 987654321);
     bigint b1(1,a), b2(1,b), b3;
     cout << b1 << ' ' << b2 << endl;
     cout << b1 + b2 << endl;

@@ -21,6 +21,7 @@ def print_tree_rec(nodes, indent, root_id):
 
 
 # non-recursive version
+# graph dfs
 def print_tree_iter(nodes):
     # build graph as adj list
     graph = dict()
@@ -31,15 +32,16 @@ def print_tree_iter(nodes):
         graph[node.parent_id].append(node.id)
 
     # use stack of id for dfs
-    labels = dict()
     child_idx = dict()
+    labels = dict()
     for node in nodes:
         child_idx[node.id] = 0
         labels[node.id] = node.label
+
+    prefix = "  "
     indent = 0
     st = [0]
     child_idx[0] = 0
-
     while st:
         root_id = st[-1]
         if child_idx[root_id] >= len(graph[root_id]):
@@ -47,7 +49,7 @@ def print_tree_iter(nodes):
             indent -= 1
         else:
             child = graph[root_id][child_idx[root_id]]
-            print "%s%s" % ("  " * indent, labels[child])
+            print "%s%s" % (prefix * indent, labels[child])
             st.append(child)
             indent += 1
             child_idx[root_id] += 1

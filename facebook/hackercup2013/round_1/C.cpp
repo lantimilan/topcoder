@@ -1,24 +1,29 @@
-// project to X and Y
+// sweep line
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
+#include <set>
 #include <vector>
 #include <utility>
 using namespace std;
 
 typedef pair<int,int> pii;
+typedef set<int>::iterator iter_type;
 
-int X[1000000+5];
-int Y[1000000+5];
-vector<pii> Xinterval;
-vector<pii> Yinterval;
+const int MM = 1e6;
+const int TAG = 1e9;
+pii xlist[2*MM+5];
+set<int> ylist;
+int X[MM+5];
+int Y[MM+5];
 
-
-pii get_range(int x, int window, int cap)
+void print_set(const set<int> &st)
 {
-    int xl, xr;
-    xl = max(0, x-window+1); xr = min(cap, x+window);
-    return pii(xl, xr);
+    iter_type it;
+    for (it = st.begin(); it != st.end(); ++it)
+        cout << *it << " ";
+    cout << endl;
 }
 
 void solve(int tcase)
@@ -33,38 +38,61 @@ void solve(int tcase)
         X[i] = (X[i - 1] * a + Y[i - 1] * b + 1) % W;
         Y[i] = (X[i - 1] * c + Y[i - 1] * d + 1) % H;
     }
-    sort(X, X+N);
-    sort(Y, Y+N);
-
-    for (int i=0; i<N; ++i) cout << X[i] << ' '; cout << endl;
-    for (int i=0; i<N; ++i) cout << Y[i] << ' '; cout << endl;
-    // merge interval
-    Xinterval.clear(); Yinterval.clear();
+    //for (int i=0; i<N; ++i)
+    //    cout << " (" << X[i] << "," << Y[i] << ") ";
+    //cout << endl;
+    int E=0;
     for (int i=0; i<N; ++i) {
-        pii xseg = get_range(X[i], P, W-P+1);
-        pii yseg = get_range(Y[i], Q, H-Q+1);
-        if (!Xinterval.empty() && Xinterval.back().second >= xseg.first)
-            Xinterval.back().second = xseg.second;
-        else
-            Xinterval.push_back(xseg);
-        if (!Yinterval.empty() && Yinterval.back().second >= yseg.first)
-            Yinterval.back().second = yseg.second;
-        else
-            Yinterval.push_back(yseg);
+        int l = max(0, X[i]-P+1);
+        xlist[E++] = pii(l, Y[i]);
+        xlist[E++] = pii(X[i], Y[i] + TAG);
     }
-    int xcnt=0, ycnt=0;
-    for (int i=0; i<Xinterval.size(); ++i) {
-        pii xseg = Xinterval[i];
-        int cnt = xseg.second - xseg.first;
-        xcnt += cnt;
+    sort(xlist, xlist + E);
+    ylist.clear();
+    int ans = (W-P+1)*(H-Q+1);
+    int yall = 0;
+    int pos=0;
+    for (int x=0; x<=W-P; ++x) {
+        // enter event
+        while (pos < E && xlist[pos].first == x && xlist[pos].second < TAG) {
+            int y = xlist[pos++].second;
+            if (!ylist.count(y)) {
+                pair<iter_type, bool> pp = ylist.insert(y);
+                assert(pp.second);
+                iter_type it = pp.first, it2;
+                int upper = min(y, H-Q), lower = max(0, y-Q+1);
+                it2 = it; if (++it2 != ylist.end()) {
+                    upper = min(upper, *it2 - Q);
+                }
+                if (it != ylist.begin()) {
+                    it2 = it; --it2;
+                    lower = max(lower, *it2 + 1);
+                }
+                //cout << "upper " << y << ' ' << upper << ' ' << lower << endl;
+                if (lower <= upper) yall += upper-lower+1;
+            }
+        }
+        //cout << "xpos " << x << ' ' << yall << endl;
+        //print_set(ylist);
+        ans -= yall;
+        // leave event
+        while (pos < E && xlist[pos].first == x && xlist[pos].second >= TAG) {
+            int y = xlist[pos++].second - TAG;
+            if (ylist.count(y)) {
+                iter_type it = ylist.find(y), it2;
+                int upper = min(y, H-Q), lower = max(0, y-Q+1);
+                it2 = it; if (++it2 != ylist.end()) {
+                    upper = min(upper, *it2 - Q);
+                }
+                if (it != ylist.begin()) {
+                    it2 = it; --it2;
+                    lower = max(lower, *it2 + 1);
+                }
+                if (lower <= upper) yall -= (upper-lower+1);
+                ylist.erase(it);
+            }
+        }
     }
-    for (int i=0; i<Yinterval.size(); ++i) {
-        pii yseg = Yinterval[i];
-        int cnt = yseg.second - yseg.first;
-        ycnt += cnt;
-    }
-    int ans = W*H - xcnt*ycnt;
-    ans -= ((P-1)*H + (Q-1)*W - (P-1)*(Q-1));
     cout << "Case #" << tcase << ": " << ans << endl;
 }
 

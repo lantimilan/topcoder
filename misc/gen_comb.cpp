@@ -6,6 +6,18 @@
 #include <vector>
 using namespace std;
 
+string dec_to_bin(int n)
+{
+    string bin(32, '0');
+    for (int i=0; i<32; ++i)
+        if (n & 1<<i) bin[i] = '1';
+        else bin[i] = '0';
+    for (int i=0, j=bin.length()-1; i<j; ++i, --j) {
+        char ch = bin[i]; bin[i] = bin[j]; bin[j] = ch;
+    }
+    return bin;
+}
+
 vector<string> gen_hash(const string &hash)
 {
     int perf_cnt = 0;  // performance counter
@@ -28,7 +40,7 @@ vector<string> gen_hash(const string &hash)
     for (int i=0; i<len; ++i)
         tmp[i] = toupper(tmp[i]);
     all_hash.push_back(tmp);
-    cout << "mask " << mask << ", perf-count: " << perf_cnt << endl;
+    cout << "mask " << dec_to_bin(mask) << ", perf-count: " << perf_cnt << endl;
     return all_hash;
 }
 

@@ -8,224 +8,287 @@
 //
 // dude, large integer arithmetic
 
+
+// bigint.cpp
+
 #include <algorithm>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <vector>
+#include <utility>
 using namespace std;
 
-typedef long long int64;
+class bigint;  // forward declaration
+bigint operator+(const bigint &a, const bigint &b);
+bigint operator-(const bigint &a, const bigint &b);
+bigint operator*(const bigint &a, const bigint &b);
+bigint operator*(const bigint &a, int b);
+pair<bigint,bigint> operator/(const bigint &a, const bigint &b);  // not implemented
+ostream& operator<<(ostream &os, const bigint &b);
 
-struct bigint {
+class bigint {
+  public:
+    // interface
+    bigint& operator+=(const bigint &b);  // why return reference here? for a += b += c?
+    bigint& operator-=(const bigint &b);
+    bigint& operator*=(const bigint &b);
+    bigint& operator*=(int b);
+
+    static const int UNIT = 1e9;
+    static const int PAD = 9;  // digits in one unit
+
+    // constructor
+    bigint();
+    explicit bigint(int sign);
+    bigint(int sign, const vector<int> &v);
+
+    // getter
+    int get_sign() const;
+    const vector<int> &get_data() const;
+
+  private:
     vector<int> data;
     int sign;
-    static const int UNIT = 1e9;  // 2*UNIT fits INT_MAX
-    static const int PAD = 9;  // log_10 of UNIT
-//public:
-    bigint();
-    void print(ostream &os);
-    bigint operator+(const bigint &b);
-    bigint operator-(const bigint &b);
-    bigint operator*(const bigint &b);
-    bigint operator/(const bigint &b);  // not implemented
-    void lshift(int n);
-    void trim();  // remove leading zeros
-//private:
-    bigint add(const vector<int> &b);
-    bigint sub(const vector<int> &b);
-    bigint slowmult(const bigint &b);
-    bigint fastmult(const bigint &b);
-    bigint single_mult(int b);
-    int cmp(const vector<int> &b);
+
+    bigint& slow_mult(const bigint &b);
+    bigint& fast_mult(const bigint &b);
+
+    pair<bigint,bigint> split(int l) const;
+    // static
+    static vector<int> add(const vector<int> &v1, const vector<int> &v2);
+    static vector<int> sub(const vector<int> &v1, const vector<int> &v2);
+    static vector<int> mult(const vector<int> &v1, const vector<int> &v2);
+    static vector<int> mult(const vector<int> &v1, int b);
+    static int cmp(const vector<int> &v1, const vector<int> &v2);
+    static int show_sign(int k);
+    static void lshift(vector<int> &v, int p);
 };
 
-ostream& operator<<(ostream& os, const bigint &b) {
-    if (b.data.size() == 0) return os << 0;
-    int i = b.data.size()-1;
-    for (; i > 0 && b.data[i] == 0; --i) ;
-    if (i==0 && b.data[i] == 0) if (b.sign == -1) os << "-";
-    os << b.data[i];
-    for (--i; i>=0; --i)
-        os << setfill('0') << setw(b.PAD) << b.data[i];  // need to pad zeros
+// global operators
+ostream& operator<<(ostream &os, const bigint &b)
+{
+    const vector<int> &v = b.get_data();
+    if (v.empty()) { return os << 0; }
+    int i;
+    for (i=v.size()-1; i>0 && v[i] == 0; --i) ;  // skip leading zero
+    if (b.get_sign() < 0 && v[i] > 0) os << "-";  // minus sign if negative
+    os << v[i];
+    for (--i; i>=0; --i) os << setfill('0') << setw(b.PAD) << v[i];
     return os;
 }
 
-bigint::bigint() {
-    sign = 1;
+bigint operator+(const bigint &a, const bigint &b)
+{
+    bigint c = a; c += b; return c;
 }
 
-void bigint::lshift(int n)
+bigint operator-(const bigint &a, const bigint &b)
 {
-    int l = data.size();
-    data.resize(l + n);
-    for (int i=l-1, j=l+n-1; i>=0; --i, --j) {
-        data[j] = data[i];
+    bigint c = a; c -= b; return c;
+}
+
+bigint operator*(const bigint &a, const bigint &b)
+{
+    bigint c = a; c *= b; return c;
+}
+
+bigint operator*(const bigint &a, int b)
+{
+    bigint c = a; c *= b; return c;
+}
+
+
+// constructors
+bigint::bigint() { sign=1; }
+bigint::bigint(int sign) { this->sign=sign; }
+bigint::bigint(int sign, const vector<int> &v) { this->sign = sign; this->data = v; }
+
+// getters
+int bigint::get_sign() const { return sign; }
+const vector<int> & bigint::get_data() const { return data; }
+
+// members
+bigint& bigint::operator+=(const bigint &b)
+{
+    vector<int> v;
+    if (this->sign == b.sign) {
+        v = add(data, b.data);
+    } else {
+        if (cmp(data, b.data) >= 0) {
+            v = sub(data, b.data);
+        } else {  // need to change sign
+            this->sign = b.sign;
+            v = sub(b.data, data);
+        }
     }
-    for (int i=0; i<n; ++i) data[i] = 0;
+    this->data = v;
+    return *this;
 }
 
-void bigint::trim()
+bigint& bigint::operator-=(const bigint &b)
 {
-    int len = data.size();
-    while (len-1 > 0 && data[len-1] == '0')
-        len--;
-    //assert(len > 0);
-    data.resize(len);
+    vector<int> v;
+    if (this->sign != b.sign) {
+        v = add(data, b.data);
+    } else {
+        if (cmp(data, b.data) >= 0) {
+            v = sub(data, b.data);
+        } else {
+            this->sign = -b.sign;
+            v = sub(b.data, data);
+        }
+    }
+    this->data = v;
+    return *this;
 }
 
-int bigint::cmp(const vector<int> &b)
+bigint& bigint::operator*=(int b)
 {
-    int n1 = data.size(), n2 = b.size();
-    // skip leading zeros
-    for (; n1 > 0 && data[n1-1] == 0; --n1) ;
-    for (; n2 > 0 && b[n2-1] == 0; --n2) ;
-    if (n1 != n2) return n1 - n2;
-    for (int i=n1-1; i>=0; --i)
-        if (data[i] != b[i]) return data[i] - b[i];
-    return 1;  // treat zero as +0
+    this->sign = this->sign * show_sign(b);
+    if (b < 0) b = -b;
+    this->data = mult(this->data, b);
+    return *this;
 }
 
-int getsign(int k)
+bigint& bigint::operator*=(const bigint &b)
+{
+    //return slow_mult(b);
+    return fast_mult(b);
+}
+
+// static
+vector<int> bigint::mult(const vector<int> &v1, int b)
+{
+    assert(b >= 0 && "multiplier must be nonnegative");
+    vector<int> vec(v1.size());
+    int carry = 0;
+    for (int i=0; i<v1.size(); ++i) {
+        long long t = carry + (long long)b * v1[i];
+        carry = t / UNIT;
+        vec[i] = t % UNIT;
+    }
+    if (carry) vec.push_back(carry);
+    return vec;
+}
+
+bigint& bigint::slow_mult(const bigint &b)
+{
+    this->sign = this->sign * b.sign;
+    vector<int> ans;
+    for (int i=0; i<this->data.size(); ++i) {
+        vector<int> tmp = mult(b.data, this->data[i]);
+        lshift(tmp, i);
+        ans = add(ans, tmp);
+    }
+    this->data = ans;
+    return *this;
+}
+
+bigint& bigint::fast_mult(const bigint &b)
+{
+    int l1, l2, t1, t2, l, m;
+    l1 = data.size(); l2 = b.data.size();
+    l = max(l1, l2); m = l/2;
+    if (min(l1,l2) <5) return slow_mult(b);
+
+    pair<bigint,bigint> p1 = this->split(m);
+    pair<bigint,bigint> p2 = b.split(m);
+    bigint a1 = p1.first;
+    bigint a2 = p1.second;
+    bigint b1 = p2.first;
+    bigint b2 = p2.second;
+    //cout << a1 << ' ' << b1 << ' ' << a2 << ' ' << b2 << endl;
+
+    bigint A, B, C;
+    A = a2; A.fast_mult(b2);
+    B = (a1+a2); B.fast_mult(b1+b2);
+    C = a1; C.fast_mult(b1);
+    B -= (A+C);
+
+    lshift(A.data, 2*m);
+    lshift(B.data, m);
+    *this = A+B+C;
+    return *this;
+}
+
+pair<bigint,bigint> bigint::split(int l) const
+{
+    bigint b1, b2; b1.sign = b2.sign = this->sign;
+    int n = data.size();
+    int l1=min(n, l), l2 = n-l1;
+    b1.data.resize(l1); b2.data.resize(l2);
+    for (int i=0; i<l1; ++i)
+        b1.data[i] = this->data[i];
+    for (int i=0; i<l2; ++i)
+        b2.data[i] = this->data[i+l1];
+    return make_pair(b1,b2);
+}
+
+vector<int> bigint::add(const vector<int> &v1, const vector<int> &v2)
+{
+    int carry = 0;
+    int n1, n2, n3;
+    n1 = v1.size(); n2 = v2.size();
+    n3 = max(n1, n2);
+    vector<int> v3(n3);
+    for (int i=0; i<n3; ++i) {
+        int t = carry;
+        if (i<n1) t += v1[i];
+        if (i<n2) t += v2[i];
+        carry = t / UNIT;
+        v3[i] = t % UNIT;
+    }
+    if (carry) v3.push_back(carry);
+    return v3;
+}
+
+vector<int> bigint::sub(const vector<int> &v1, const vector<int> &v2)
+{
+    int n1, n2, n3;
+    assert(cmp(v1, v2) >= 0 && "subtract large from small");
+    n1 = v1.size(); n2 = v2.size(); n3 = n1;
+    vector<int> v3(n3);
+    int borrow = 0;
+    for (int i=0; i<n1; ++i) {
+        int t = v1[i] - borrow;
+        if (i < n2) t -= v2[i];
+        if (t < 0) { borrow = 1; t += UNIT; }
+        else { borrow = 0; }
+        v3[i] = t;
+    }
+    return v3;
+}
+
+int bigint::cmp(const vector<int> &v1, const vector<int> &v2)
+{
+    int n1, n2;
+    n1 = v1.size(); n2 = v2.size();
+    for (; n1>0 && v1[n1-1] == 0; n1--) ;  // skip leading zero
+    for (; n2>0 && v2[n2-1] == 0; n2--) ;  // skip leading zero
+    if (n1 != n2) return show_sign(n1-n2);
+    for (int i=n1-1; i>=0; --i) {
+        if (v1[i] != v2[i]) return show_sign(v1[i]-v2[i]);
+    }
+    return 0;
+}
+
+int bigint::show_sign(int k)
 {
     if (k>=0) return 1;
     else return -1;
 }
 
-bigint bigint::operator+(const bigint &b) {
-    bigint ans;
-    int sign;
-    if (this->sign > 0 && b.sign < 0) { ans = sub(b.data); sign = getsign(cmp(b.data)); }
-    if (this->sign > 0 && b.sign > 0) { ans = add(b.data); sign = 1; }
-    if (this->sign < 0 && b.sign > 0) { ans = sub(b.data); sign = -getsign(cmp(b.data)); }
-    if (this->sign < 0 && b.sign < 0) { ans = add(b.data); sign = -1; }
-    ans.sign = sign; assert(sign == -1 || sign == 1);
-    ans.trim();
-    return ans;
-}
-
-bigint bigint::operator-(const bigint &b) {
-    bigint ans;
-    int sign;
-    if (this->sign > 0 && b.sign < 0) { ans = add(b.data); sign = 1; }
-    if (this->sign > 0 && b.sign > 0) { ans = sub(b.data); sign = getsign(cmp(b.data)); }
-    if (this->sign < 0 && b.sign > 0) { ans = sub(b.data); sign = -1; }
-    if (this->sign < 0 && b.sign < 0) { ans = add(b.data); sign = -getsign(cmp(b.data)); }
-    ans.sign = sign; assert(sign == -1 || sign == 1);
-    ans.trim();
-    return ans;
-}
-
-bigint bigint::operator*(const bigint &b) {
-    //bigint ans = fastmult(b);
-    bigint ans = slowmult(b);
-    ans.trim(); assert(sign == -1 || sign == 1);
-    return ans;
-}
-
-bigint bigint::add(const vector<int> &b)
+void bigint::lshift(vector<int> &v, int p)
 {
-    int n1 = data.size(), n2 = b.size();
-    int n3 = max(n1,n2);
-    bigint c; c.data.resize(n3);
-    int carry = 0;
-    for (int i=0; i<n3; ++i) {
-        int t = carry;
-        if (i < n1) t += data[i];
-        if (i < n2) t += b[i];
-        c.data[i] = t % UNIT;
-        carry = t / UNIT;
-    }
-    if (carry) c.data.push_back(carry);
-    return c;
+    int n = v.size();
+    v.resize(n+p);
+    for (int i=n-1, j=n+p-1; i>=0; --i, --j)
+        v[j] = v[i];
+    for (int i=0; i<p; ++i)
+        v[i] = 0;
 }
-
-bigint bigint::sub(const vector<int> &b)
-{
-    vector<int> v1, v2;
-    v1 = this->data; v2 = b;
-    if (cmp(b) < 0) v1.swap(v2);
-
-    bigint ans; ans.data.resize(v1.size());
-    int borrow = 0;
-    for (int i=0; i<v1.size(); ++i) {
-        int t = v1[i] - borrow;
-        if (i < v2.size()) t -= v2[i];
-        if (t < 0) { borrow = 1; t += UNIT; }
-        else { borrow = 0; }
-        ans.data[i] = t;
-    }
-    assert(borrow == 0);
-    return ans;
-}
-
-bigint bigint::single_mult(int b)
-{
-    // mult b[i] to a
-    vector<int> row(data.size(), 0);
-    int64 t=0, carry=0;
-    for (int j=0; j<data.size(); ++j) {
-        t = carry + (int64)b * data[j];  // forgot to add carry earlier
-        carry = t / UNIT;
-        row[j] = t % UNIT;
-    }
-    if (carry) row.push_back(carry);
-    bigint ans; ans.data = row;
-    ans.sign = getsign(b * this->sign);
-    return ans;
-}
-
-bigint bigint::slowmult(const bigint &b)
-{
-    int sign;
-    if (this->sign == b.sign) sign = 1;
-    else sign = -1;
-    int n1 = data.size(), n2 = b.data.size();
-    int n3 = n1*n2;
-    bigint c; c.sign = sign;
-    for (int i=0; i<n2; ++i) {
-        bigint tmp = single_mult(b.data[i]);
-        tmp.lshift(i);
-        c = c.add(tmp.data);
-    }
-    return c;
-}
-
-// Karatsuba's algorithm
-// O(n^1.59)
-bigint bigint::fastmult(const bigint &b)
-{
-    int l1 = data.size(), l2 = b.data.size();
-    int n = max(l1, l2);
-    int l = n/2;
-    if (min(l1,l2) < 5) return slowmult(b);
-
-    bigint a1, a2, b1, b2;
-    a1.data.resize(max(l1-l, 0));
-    a2.data.resize(min(l1, l));
-    a1.sign = a2.sign = this->sign;
-    b1.data.resize(max(l2-l, 0));
-    b2.data.resize(min(l2, l));
-    b1.sign = b2.sign = b.sign;
-    for (int i=0; i<l; ++i) {
-        if (i < a2.data.size()) a2.data[i] = data[i];
-        if (i < b2.data.size()) b2.data[i] = b.data[i];
-    }
-    for (int i=l; i<n; ++i) {
-        if (i-l < a1.data.size()) a1.data[i-l] = data[i];
-        if (i-l < b1.data.size()) b1.data[i-l] = b.data[i];
-    }
-    bigint A, B, C;
-    A = a1.fastmult(b1);
-    B = (a1+a2).fastmult(b1+b2);
-    C = a2.fastmult(b2);
-    A.lshift(2*l);
-    B = B - (A + C);
-    B.lshift(l);
-    bigint ans = A+B+C;
-    ans.trim();
-    return ans;
-}
+// end static
 
 int gcd(int a, int b)
 {
@@ -234,15 +297,11 @@ int gcd(int a, int b)
 
 bigint mypow(int a, int n)
 {
-    bigint c; c.data = vector<int>(1,1);
-    /*
-    for (int i=0; i<n; ++i) c = c.single_mult(a);
-    return c;
-    */
-    bigint base; base.data = vector<int>(1,a);
+    bigint c(1, vector<int>(1,1));
+    bigint base(1, vector<int>(1,a));
     while (n > 0) {
-        if (n & 1) c = c * base;
-        base = base * base;
+        if (n & 1) c *= base;
+        base *= base;
         n /= 2;
     }
     return c;
@@ -250,7 +309,7 @@ bigint mypow(int a, int n)
 
 bigint choose(int n, int r)
 {
-    bigint ans; ans.data = vector<int>(1,1);
+    bigint ans(1, vector<int>(1,1));
     vector<int> num(r), deno(r);
     for (int i=0; i<r; ++i) num[i] = n-i;
     for (int i=0; i<r; ++i) deno[i] = i+1;
@@ -265,7 +324,7 @@ bigint choose(int n, int r)
     }
 
     for (int i=0; i<r; ++i) {
-        ans = ans.single_mult(num[i]);
+        ans *= num[i];
     }
     return ans;
 }
@@ -296,25 +355,11 @@ int main()
     int zero, other;
     for (zero = 0; zero <= N/2; ++zero) {
         other = N-1 - zero;
-        ans = ans + choose(other+1, zero) * mypow(K-1, other);
+        ans += choose(other+1, zero) * mypow(K-1, other);
     }
-    bigint t; t.data = vector<int>(1, K-1);
-    ans = ans * t;
+    ans *= (K-1);
     cout << ans << endl;
-
-    /*
-    bigint a, b;
-    a.data = vector<int>(2, 123456789);
-    b.data = vector<int>(2, 987654321);
-    cout << (a+b) << endl;
-    cout << (a-b) << endl;
-    cout << (a*b) << endl;
-    cout << (a-a) << endl;
-    b.data[1] = a.data[1];
-    cout << (b-a) << endl;
-    b.data[1] = b.data[0];
-    b.data[0] = a.data[0];
-    cout << (b-a) << endl;
-    */
 }
 
+// seems all bigint are working
+// got TLE as expected

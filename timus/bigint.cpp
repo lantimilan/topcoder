@@ -43,7 +43,7 @@ class bigint {
     bigint& slow_mult(const bigint &b);
     bigint& fast_mult(const bigint &b);
 
-    pair<bigint,bigint> split(int l);
+    pair<bigint,bigint> split(int l) const;
     // static
     static vector<int> add(const vector<int> &v1, const vector<int> &v2);
     static vector<int> sub(const vector<int> &v1, const vector<int> &v2);
@@ -142,8 +142,8 @@ bigint& bigint::operator*=(int b)
 
 bigint& bigint::operator*=(const bigint &b)
 {
-    return slow_mult(b);
-    // return fast_mult(b);
+    //return slow_mult(b);
+    return fast_mult(b);
 }
 
 // static
@@ -174,38 +174,45 @@ bigint& bigint::slow_mult(const bigint &b)
     return *this;
 }
 
-/*
-bigint bigint::fast_mult(const bigint &b)
+bigint& bigint::fast_mult(const bigint &b)
 {
-    int l1, l2, t1, t2;
-    bigint a1, a2, b1, b2;
+    int l1, l2, t1, t2, l, m;
     l1 = data.size(); l2 = b.data.size();
-
+    l = max(l1, l2); m = l/2;
     if (min(l1,l2) <5) return slow_mult(b);
 
-    int l = max(l1, l2), m = l/2;
-    t1 = min(m, l1); t2 = l1 - t1;
-    a1.data.resize(t1); a2.data.resize(t2);
-    for (int i=0; i<t1; ++i) a1.data[i] = data[i];
-    for (int i=0; i<t2; ++i) a2.data[i] = data[i+t1];
-    a1.sign = a2.sign = this->sign;
-
-    t1 = min(m, l2); t2 = l2 - t1;
-    b1.data.resize(t1); b2.data.resize(t2);
-    for (int i=0; i<t1; ++i) b1.data[i] = b.data[i];
-    for (int i=0; i<t2; ++i) b2.data[i] = b.data[i+t1];
-    b1.sign = b2.sign = b.sign;
+    pair<bigint,bigint> p1 = this->split(m);
+    pair<bigint,bigint> p2 = b.split(m);
+    bigint a1 = p1.first;
+    bigint a2 = p1.second;
+    bigint b1 = p2.first;
+    bigint b2 = p2.second;
+    //cout << a1 << ' ' << b1 << ' ' << a2 << ' ' << b2 << endl;
 
     bigint A, B, C;
-    A = a2.fast_mult(b2);
-    B = (a1+a2).fast_mult(b1+b2);
-    C = a1.fast_mult(b1);
+    A = a2; A.fast_mult(b2);
+    B = (a1+a2); B.fast_mult(b1+b2);
+    C = a1; C.fast_mult(b1);
+    B -= (A+C);
 
-    A.lshift(2*m);
-    B.lshift(m);
-    return A+B+C;
+    lshift(A.data, 2*m);
+    lshift(B.data, m);
+    *this = A+B+C;
+    return *this;
 }
-*/
+
+pair<bigint,bigint> bigint::split(int l) const
+{
+    bigint b1, b2; b1.sign = b2.sign = this->sign;
+    int n = data.size();
+    int l1=min(n, l), l2 = n-l1;
+    b1.data.resize(l1); b2.data.resize(l2);
+    for (int i=0; i<l1; ++i)
+        b1.data[i] = this->data[i];
+    for (int i=0; i<l2; ++i)
+        b2.data[i] = this->data[i+l1];
+    return make_pair(b1,b2);
+}
 
 vector<int> bigint::add(const vector<int> &v1, const vector<int> &v2)
 {
@@ -276,9 +283,10 @@ void bigint::lshift(vector<int> &v, int p)
 int main()
 {
     vector<int> a(10, 123456789), b(10, 987654321);
+    //vector<int> a(5, 7), b(5, 5);  // 4320901235
     bigint b1(1,a), b2(1,b), b3;
     cout << b1 << ' ' << b2 << endl;
-    cout << b1 + b2 << endl;
-    cout << b1 - b2 << endl;
+    //cout << b1 + b2 << endl;
+    //cout << b1 - b2 << endl;
     cout << b1 * b2 << endl;
 }

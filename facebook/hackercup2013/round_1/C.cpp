@@ -1,4 +1,6 @@
 // sweep line
+//
+// what is the problem with my implementation
 
 #include <algorithm>
 #include <cassert>
@@ -53,7 +55,7 @@ void solve(int tcase)
     ylist.clear();
     int ans = (W-P+1)*(H-Q+1);
     int yall = 0;
-    int pos=0;
+    int pos=0, prev;
     //for (int x=0; x<=W-P; ++x) {
     for (int x=0; x<W; ++x) {
         // enter event
@@ -78,7 +80,8 @@ void solve(int tcase)
         //cout << "xpos " << x << ' ' << yall << endl;
         //print_set(ylist);
         ans -= yall;
-        // leave event
+        // leave event, first compute the union, then evict all exiting y[i]
+        prev = pos;
         while (pos < E && xlist[pos].first == x && xlist[pos].second >= TAG) {
             int y = xlist[pos++].second - TAG;
             if (ylist.count(y)) {
@@ -92,8 +95,11 @@ void solve(int tcase)
                     lower = max(lower, *it2 + 1);
                 }
                 if (lower <= upper) yall -= (upper-lower+1);
-                ylist.erase(it);
             }
+        }
+        for (; prev < pos; ++prev) {
+            int y = xlist[prev].second - TAG;
+            ylist.erase(y);
         }
     }
     cout << "Case #" << tcase << ": " << ans << endl;

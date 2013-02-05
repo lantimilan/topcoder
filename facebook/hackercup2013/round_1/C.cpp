@@ -48,6 +48,8 @@ void solve(int tcase)
         xlist[E++] = pii(X[i], Y[i] + TAG);
     }
     sort(xlist, xlist + E);
+    pii *end = unique(xlist, xlist+E);
+    E = end - xlist;
     ylist.clear();
     int ans = (W-P+1)*(H-Q+1);
     int yall = 0;

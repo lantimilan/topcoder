@@ -48,13 +48,14 @@ void solve(int tcase)
         xlist[E++] = pii(X[i], Y[i] + TAG);
     }
     sort(xlist, xlist + E);
-    pii *end = unique(xlist, xlist+E);
-    E = end - xlist;
+    //pii *end = unique(xlist, xlist+E);
+    //E = end - xlist;
     ylist.clear();
     int ans = (W-P+1)*(H-Q+1);
     int yall = 0;
     int pos=0;
-    for (int x=0; x<=W-P; ++x) {
+    //for (int x=0; x<=W-P; ++x) {
+    for (int x=0; x<W; ++x) {
         // enter event
         while (pos < E && xlist[pos].first == x && xlist[pos].second < TAG) {
             int y = xlist[pos++].second;
@@ -62,7 +63,7 @@ void solve(int tcase)
                 pair<iter_type, bool> pp = ylist.insert(y);
                 assert(pp.second);
                 iter_type it = pp.first, it2;
-                int upper = min(y, H-Q), lower = max(0, y-Q+1);
+                int upper = y, lower = max(0, y-Q+1);
                 it2 = it; if (++it2 != ylist.end()) {
                     upper = min(upper, *it2 - Q);
                 }
@@ -82,7 +83,7 @@ void solve(int tcase)
             int y = xlist[pos++].second - TAG;
             if (ylist.count(y)) {
                 iter_type it = ylist.find(y), it2;
-                int upper = min(y, H-Q), lower = max(0, y-Q+1);
+                int upper = y, lower = max(0, y-Q+1);
                 it2 = it; if (++it2 != ylist.end()) {
                     upper = min(upper, *it2 - Q);
                 }

@@ -15,7 +15,7 @@ void solve(int tcase)
     int W, H, P, Q, N, X, Y, a, b, c, d;
     cin >> W >> H >> P >> Q >> N >> X >> Y >> a >> b >> c >> d;
 
-    for (int yy=0; yy<=H-Q; ++yy) row[yy].clear();
+    for (int yy=0; yy<H; ++yy) row[yy].clear();
     for (int xx=0; xx<W; ++xx) col[xx] = 0;
 
     x[0] = X; y[0] = Y;

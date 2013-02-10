@@ -1,3 +1,29 @@
+// there is a O(n) time algorithm
+//
+// compute the solution with min cost and min remainder for soln with same cost
+//
+// total = 0  // total is number of Jedi's needed
+// extra = 0  // extra is combined students of floor-1 and floor
+// for floor = 0 to n-1
+//    need = (K - extra) % K  // if extra is 0, we want 0 here
+//    x = students[i]
+//    if (x >= need)
+//      fill need
+//      extra += need; x -= need;
+//      total += extra / K; assert(extra % K == 0);
+//      extra = x;
+//    else
+//      not enough to fill need, move extra to floor
+//      extra += x; need -= x;
+//      if can pull from floor+1, do this
+//      more = min(need, students[i+1])
+//      extra += more; total += ceil(extra / K); extra = 0
+// deal with the (n-1)th floor here
+// total += ceil(extra / K)
+//
+// Question: Why is this optimal?
+
+
 // try all possible centers to redistribute
 //
 // my problem is I did not realize you do not have

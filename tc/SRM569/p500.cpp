@@ -1,5 +1,15 @@
 // there is a O(n) time algorithm
 //
+// look at students[0], need = (K - s[0] % K) % K
+// if students[1] can make up need, then do so
+// this is always optimal because no move can keep floor[0] with same cost and
+// make s[1] smaller.
+// otherwise s[1] < need, then we can move s[0]%K up to floor[1]
+// then if s[2] can make need, we are good
+// else it is best to move s[2] down to floor[1], and we are optimal in floor[2]
+// floor[3..n] is independent now
+//
+//
 // compute the solution with min cost and min remainder for soln with same cost
 //
 // total = 0  // total is number of Jedi's needed

@@ -13,6 +13,11 @@
 // others has sum[i] - rem[i] < rem[i], incoming and outgoing
 //
 // use heap to keep track of sum[i] - 2*rem[i]
+//
+// NOTE: the sink node[n] has flow == sum[n] > 0, so never push
+// sink into heap
+//
+// Accepted
 
 #include <vector>
 #include <queue>
@@ -42,7 +47,7 @@ int main()
         edges.push_back(pii(a,b));
     }
     pq.push(pii(0,1));
-    for (int i=2; i<=n; ++i) {
+    for (int i=2; i<n; ++i) {
         rem[i] = sum[i];
         pq.push(pii(sum[i] - 2*rem[i], i));
     }
@@ -59,11 +64,17 @@ int main()
             if (vis[next]) continue;
             orientation[pii(node, next)] = 0;
             rem[next] -= flow; //cout << next << ' ' << rem[next] << endl;
-            pq.push(pii(sum[next] - 2*rem[next], next));
+            if (next != n) pq.push(pii(sum[next] - 2*rem[next], next));
         }
     }
     for (int i=0; i<m; ++i) {
         int a, b; a = edges[i].first; b = edges[i].second;
+        if (!(orientation.count(pii(a,b)) || orientation.count(pii(b,a))))
+            cout << "a b " << a << ' ' << b << endl;
+    }
+    for (int i=0; i<m; ++i) {
+        int a, b; a = edges[i].first; b = edges[i].second;
+        assert(orientation.count(pii(a,b)) || orientation.count(pii(b,a)));
         if (orientation.count(pii(a,b))) cout << 0 << endl;
         else cout << 1 << endl;
     }

@@ -1,36 +1,49 @@
 // prob269B.cpp
-// not submitted
+// count inversion and greedy remove the max inversion
+// this algorithm fails, but why?
+//
+// the real solution is longest increasing subsequence
 
-#include <cstring>
 #include <iostream>
 using namespace std;
 
-int dp[5005][5005];
-int cnt[5005];
+int cnt[5005];  // inversions
 int a[5005];
 
-int calc(int n, int m)
+int calc(int n)
 {
-    if (n == 0) return 0;
-    if (cnt[m] == 0) return calc(n, m-1);
-    if (dp[n][m] >= 0) return dp[n][m];
-    int p;
-    for (p = n-1; a[p] != m; --p) ;
-    a[p] = 100000;  cnt[m]--; // erase a[p];
-    int ans = calc(p, m) + n-p-1;  // move [p+1..n-1]
-    ans = min(ans, calc(n, m) + 1);
-    return dp[n][m] = ans;
+    for (int i=0; i<n; ++i) {
+        cnt[i] = 0;
+        for (int j=0; j<n; ++j) if (i!=j) {
+            if (j < i && a[j] > a[i]) cnt[i]++;
+            if (j > i && a[j] < a[i]) cnt[i]++;
+        }
+    }
+
+    int ans = 0;
+    for (int t=0; t<n; ++t) {
+        int pivot = -1;
+        for (int x=0; x<n; ++x) if (cnt[x] > 0) {
+            if (pivot < 0 || cnt[x] > cnt[pivot]) pivot = x;
+        }
+        if (pivot < 0) break;
+        ans++;
+        cnt[pivot] = 0;
+        for (int j=0; j<n; ++j) {
+            if (j < pivot && a[j] > a[pivot]) cnt[j]--;
+            if (j > pivot && a[j] < a[pivot]) cnt[j]--;
+        }
+    }
+    return ans;
 }
 
 int main()
 {
-    memset(dp, -1, sizeof dp);
-    int n; cin >> n;
+    int n, m; cin >> n >> m;
     for (int i=0; i<n; ++i) {
         double x;
         cin >> a[i] >> x;
-        cnt[a[i]]++;
     }
-    int ans = calc(n, 5000);
+    int ans = calc(n);
     cout << ans << endl;
 }

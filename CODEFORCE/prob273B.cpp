@@ -1,14 +1,20 @@
 // count eq range and ans is prod of fact(k[i])
+// divided by 2^(sum of num[i] such that a[i]==b[i])
+
+// things to watch:
+// 1. fact takes at most n = 10^5
+// 2. every pow index incr by 1 implies fact(k) becomes fact(k+2)
+// an extra pair have equal first coordinate
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
-#include <utility>
 using namespace std;
 
-typedef pair<int,int> pii;
 
-int f[200000+5];
-pii a[200000+5];
+int a[100000+5];
+int b[100000+5];
+int c[200000+5];
 int MOD;
 
 int mult(int a, int b)
@@ -16,36 +22,35 @@ int mult(int a, int b)
     return (long long)a*b % MOD;
 }
 
-int fact(int n)
+int fact(int n, int &two)
 {
-    return f[n];
-}
-
-void init()
-{
-    f[0] = 1;
-    for (int i=1; i<200000+5; ++i)
-        f[i] = mult(f[i-1], i);
+    int ans=1;
+    for (int i=2; i<=n; ++i) {
+        int t = i;
+        if (two > 0 && t % 2 == 0) { t /= 2; two--; }
+        ans = (long long)ans * t % MOD;
+    }
+    return ans;
 }
 
 int main()
 {
     int n; cin >> n;
-    for (int i=0; i<2*n; ++i) {
-        cin >> a[i].first;
-        a[i].second = i >= n ? i-n : i;
+    int two = 0;
+    for (int i=0; i<n; ++i) { cin >> a[i]; c[i] = a[i]; }
+    for (int i=0; i<n; ++i) {
+        cin >> b[i]; c[i+n] = b[i];
+        two += (a[i] == b[i]);
     }
     cin >> MOD;
-    sort(a, a+2*n);
-    init();
+    sort(c, c+2*n);
     int ans = 1;
     for (int i=0; i<2*n; ) {
-        int j=i, v=a[i].first;
-        for (++j; j<2*n && a[j] == v; ++j) ;
-        // multi-nomial theorem on a[i..j-1]
-        // how to deal with non-prime MOD?
-        ans = mult(ans, fact(j-i));
+        int j=i, v=c[i];
+        for (++j; j<2*n && c[j] == v; ++j) ;
+        ans = mult(ans, fact(j-i, two));
         i = j;
     }
+    assert(two == 0);
     cout << ans << endl;
 }

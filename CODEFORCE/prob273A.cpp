@@ -34,3 +34,5 @@ int main()
         cout << land << endl;
     }
 }
+
+// Accepted

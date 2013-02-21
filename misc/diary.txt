@@ -1,3 +1,9 @@
+
+Wed Feb 20 18:37:55 PST 2013
+----------------------------------------------------------------------
+vim tip:
+use # will jump to previous word
+
 02/06/2013
 ----------------------------------------------------------------------
 Got a call from JT@yelp. Looks I am getting an offer from them,

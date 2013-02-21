@@ -67,11 +67,20 @@ void solve()
         cin >> M[i][j];
         T[i][j] = 1 - M[i][j];
     }
-    int coeff[10][10][10];
+    int coeff[10][10][10];  // first, third, second due to matrix mult rule
+    for (int i=0; i<10; ++i)
+    for (int k=0; k<10; ++k)
+    for (int j=0; j<10; ++j)
+        coeff[i][k][j] = T[i][k];
+
+    int final[10][10][10];
+    int ans[10][10];
+    fastexp(coeff, K-1, final);
+    mult(final, T, ans);
+    int kans = 0;
     for (int i=0; i<10; ++i)
     for (int j=0; j<10; ++j)
-    for (int k=0; k<10; ++k)
-        coeff[i][j][k] = T[i][k];
+        kans =
 }
 
 int main()

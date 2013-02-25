@@ -16,30 +16,32 @@ const int MOD = 1e9+7;
 int M[10][10];
 int T[10][10];
 
-int mult(int a[][10], int b[])
+void mult(int a[][10][10], int b[][10], int c[][10][10])
 {
-    int64 ans = 0;
     int n = 10;
     for (int i=0; i<n; ++i) {
         for (int j=0; j<n; ++j) {
-            ans += a[i][j] * b[j] % MOD
-            if (ans >= MOD) ans -= MOD;
+            c[i][j] = 0;
+            for (int k=0; k<n; ++k) {
+                c[i][j] += a[i][j][k] * b[k][j];
+                if (c[i][j] >= MOD) c[i][j] -= MOD;
+            }
         }
     }
-    return ans;
 }
 
-void mult(int a[][10], int b[][10], int c[][10])
+void mult(int a[][10][10], int b[][10][10], int c[][10][10])
 {
     int n = 10;
 
     for (int i=0; i<n; ++i)
-    for (int j=0; j<n; ++j) {
-        int64 tmp = 0;
-        for (int k=0; k<n; ++k) {
-            tmp += (int64)a[i][k] * b[k][j] % MOD;
+    for (int j=0; j<n; ++j)
+    for (int k=0; k<n; ++k)
+    {
+        c[i][j][k] = 0;
+        for (int l=0; l<n; ++l) {
+            c[i][j][k] += a[i][j][l] * b[l][i][j];
         }
-        c[i][j] = tmp;
     }
 }
 
@@ -77,10 +79,13 @@ void solve()
     int ans[10][10];
     fastexp(coeff, K-1, final);
     mult(final, T, ans);
-    int kans = 0;
+    int64 kans = 0;
     for (int i=0; i<10; ++i)
-    for (int j=0; j<10; ++j)
-        kans =
+    for (int j=0; j<10; ++j) {
+        kans = kans + ans[i][j];
+        if (kans >= MOD) kans -= MOD;
+    }
+    cout << kans << endl;
 }
 
 int main()

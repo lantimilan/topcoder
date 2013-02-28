@@ -16,7 +16,8 @@ int size[60];
 double widpr[60][60], heipr[60];
 double pow2[60];
 double fact[60];
-map<pair<int, long long>, double> prob;
+double comb[60][60];
+double prob[60];
 
 void init()
 {
@@ -26,27 +27,12 @@ void init()
     fact[0] = 1;
     for (int i=1; i<=20; ++i)
         fact[i] = fact[i-1] * i;
-}
-
-double calc(int val, long long mask)
-{
-    double ans = 0;
-    if (val == 0) return 1;
-    if (mask == 0) return 0;
-    if (prob.count(make_pair(val, mask))) {
-        return prob[make_pair(val, mask)];
+    comb[0][0] = 1;
+    for (int i=1; i<=50; ++i) {
+        comb[i][0] = 1;
+        for (int j=1; j<=i; ++j)
+            comb[i][j] = comb[i-1][j] + comb[i-1][j-1];
     }
-    int nbits = 0;
-    for (int i=0; i<n; ++i) if (1LL<<i & mask) nbits++;
-
-    for (int i=0; i<n; ++i) {
-        if (1LL<<i & mask) {
-            if (val >= size[i]) {
-                ans += calc(val - size[i], mask & ~(1LL<<i));
-            }
-        }
-    }
-    return prob[make_pair(val, mask)] = ans/nbits;
 }
 
 int main()
@@ -70,13 +56,7 @@ int main()
                 widpr[width][nw] *= .5;
             }
         }
-        /*
-        prob.clear();
-        for (int height = 1; height <= R; ++height) {
-            long long mask = ((1LL<<n) - 1) & ~((1LL<<s) - 1);
-            heipr[height] = calc(height, mask);
-        }
-        */
+        /* fact(n) solution
         memset(heipr, 0, sizeof heipr);
         vector<int> vec;
         for (int i=s; i<n; ++i) vec.push_back(i);
@@ -88,14 +68,42 @@ int main()
             }
             heipr[val] += 1;
         } while (next_permutation(vec.begin(), vec.end()));
+        */
+
+        // try all subset
+        // 2^n solution
+        memset(prob, 0, sizeof prob);
+        int offset = s;
+        int r = n - s;
+        for (int b = 0; b < (1<<r); ++b) {
+            int sum = 0, nbits = 0;
+            for (int i = 0; i < r; ++i) nbits += ((b & 1<<i) != 0);
+            for (int i = 0; i < r; ++i) if (1<<i & b) {
+                sum += size[offset + i];
+            }
+            if (sum <= R) {
+                if (b+1 == (1<<r)) prob[sum] = 1;
+                else {
+                for (int i = 0; i < r; ++i) if (1<<i & ~b) {
+                    int next = size[offset + i];
+                    if (sum + next > R) //prob[sum] += fact[nbits]/fact[r];
+                        prob[sum] += 1.0 / (comb[r-1][nbits] * r);
+                }
+                }
+                //cout << "offset " << offset << ' '<< sum << ' ' << prob[sum] << endl;
+            }
+        }
 
         for (int width = 1; width <= R; ++width)
         for (int height = 1; height <= R; ++height) {
             double p1, p2;
-            p1 = widpr[width][s]; p2 = heipr[height] / fact[n-s];
+            p1 = widpr[width][s]; //p2 = heipr[height] / fact[n-s];
+            p2 = prob[height];
             ans += width * height * p1 * p2 * split;
             //cout << s << ' ' << width << ' ' << height << ' ' << p1 << ' ' << p2 << endl;
         }
     }
     cout << fixed << setprecision(6) << ans << endl;
 }
+
+// 2^n, still TLE but better than fact(n)

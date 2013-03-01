@@ -18,6 +18,7 @@ double pow2[60];
 double fact[60];
 double comb[60][60];
 double prob[60];
+double dp[55][105][55][55];  // index, sum, last, nelems
 
 void init()
 {
@@ -35,8 +36,68 @@ void init()
     }
 }
 
+int genpart(int val, int start, vector<int> &pre, const vector<int> &avail, double &pr)
+{
+    if (val < 0) return 0;
+    if (val == 0) {
+        // process pre as a partition
+        //for (int i=0; i<pre.size(); ++i) cout << pre[i] << ' '; cout << endl;
+        /*
+        int vcnt[55] = {0}, pcnt[55] = {0};
+        for (int i=0; i<pre.size(); ++i) pcnt[pre[i]]++;
+        for (int i=0; i<avail.size(); ++i) if (avail[i] > 0) vcnt[avail[i]]++;
+
+        bool good = true;
+        for (int v=1; v<=R; ++v) if (pcnt[v] > vcnt[v]) good =false;
+
+        if (good) {
+            double cur = 1;
+            for (int v=1; v<=R; ++v) cur *= comb[vcnt[v]][pcnt[v]];
+            int n = avail.size();
+            cur /= (n * comb[n-1][pre.size()]);
+            pr += cur;
+        }
+        */
+        return 1;
+    }
+    int ans = 0;
+    for (int i = start; i <= val; ++i) {
+        pre.push_back(i);
+        ans += genpart(val-i, i, pre, avail, pr);
+        pre.pop_back();
+    }
+    return ans;
+}
+
+double calc(int height, vector<int> vec)
+{
+    double ans = 0;
+    for (int i = 0; i < vec.size(); ++i) if (vec[i] + height > R) {
+        int old = vec[i]; vec[i] = -1;
+        // solve for height and vec
+        vector<int> tmp;
+        double pr = 0;
+        genpart(height, 1, tmp, vec, pr);
+        ans += pr;
+        vec[i] = old;
+    }
+    //cout << "calc " << height << ' ' << vec[vec.size()-1] << ' ' << ans << endl;
+    return ans;
+}
+
 int main()
 {
+/*  test partition  */
+    /* only .245 sec
+    for (int i=1; i<=50; ++i) {
+        cout << "i = " << i << endl;
+        vector<int> v;
+        int cnt = genpart(i, 1, v);
+        cout << "part = " << cnt << endl << endl;
+    }
+    return 0;
+    */
+
     init();
     cin >> n;
     for (int i=0; i<n; ++i) cin >> size[i];
@@ -72,6 +133,7 @@ int main()
 
         // try all subset
         // 2^n solution
+        /*
         memset(prob, 0, sizeof prob);
         int offset = s;
         int r = n - s;
@@ -93,12 +155,30 @@ int main()
                 //cout << "offset " << offset << ' '<< sum << ' ' << prob[sum] << endl;
             }
         }
+        */
+
+        // generate all partition of v = 1 to 50
+        vector<int> vec;
+        for (int i=s; i<n; ++i) vec.push_back(size[i]);
+        int nvec = vec.size();
+
+        memset(prob, 0, sizeof prob);
+        int total = 0;
+        for (int i = 0; i < nvec; ++i) total += vec[i];
+
+        if (total <= R) prob[total] = 1;
+        else {
+            for (int height = 1; height <= R; ++height) {
+            cout << "s " << s << " height " << height << endl;
+                prob[height] = calc(height, vec);
+            }
+        }
 
         for (int width = 1; width <= R; ++width)
         for (int height = 1; height <= R; ++height) {
             double p1, p2;
             p1 = widpr[width][s]; //p2 = heipr[height] / fact[n-s];
-            p2 = prob[height];
+            p2 = prob[height]; //if (p2 > 0) cout << "s " << s << ", " << height << ' ' << p2 << endl;
             ans += width * height * p1 * p2 * split;
             //cout << s << ' ' << width << ' ' << height << ' ' << p1 << ' ' << p2 << endl;
         }

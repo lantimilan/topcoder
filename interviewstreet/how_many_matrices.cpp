@@ -57,14 +57,21 @@ int inv(int a)
 int main()
 {
     int N; cin >> N;
+    if (N >= MOD) { cout << 0 << endl; return 0; }  // why count must be a multiple of N, No it is not
     int64 ans = 0;
     for (int d = 1; (int64)d * d <= N; ++d)
     if (N % d == 0)
     {
-        int p, q, deno, cur;
+        int p, q, deno;
+        int64 cur;
         p = d, q = N / d;
-        deno = dblfact(p+q-1);
-        cur = fact(N) * (int64)dblfact(p-1) * dblfact(q-1) % MOD * inv(deno) % MOD;
+        //deno = dblfact(p+q-1);
+        //cur = fact(N) * (int64)dblfact(p-1) * dblfact(q-1) % MOD * inv(deno) % MOD;
+        cur = 1;
+        for (int k=0; k<p; ++k)
+            cur = cur * fact(q + k) * inv(fact(k)) % MOD;
+        cur = fact(N) * inv(cur) % MOD;
+
         if (p == q) ans += cur;
         else ans += cur + cur;
         if (ans >= MOD) ans -= MOD;

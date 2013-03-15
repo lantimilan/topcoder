@@ -1,0 +1,6 @@
+failed 250 and cannot work out 450.
+250 is when you do not have 3 elements.
+450 cannot figure out each node only need altitude[0..n-1] as possible configuration.
+One more mistake when doing 450 offline, start state can be (0, j) for j=0..n-1,
+this is different from start at (0,0) and hope to reach all (0, j) because we need
+altitude[0] >= altitude[j] for this move to be feasible.

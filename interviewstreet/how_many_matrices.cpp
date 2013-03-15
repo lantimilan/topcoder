@@ -14,33 +14,47 @@
 // a 2x3 tableau, entry (0,1) has hook length 2+2-1 = 3
 //
 
+#include <cassert>
 #include <iostream>
 #include <map>
 using namespace std;
 
 typedef long long int64;
 const int MOD = 10007;
+map<int,int> memo;
 
-int fact(int n)
+// return k such that p^k is the largest power of p that divides n
+int count_pow(int n, int p)
 {
-    int64 ans = 1;
-    for (int i=2; i<=n; ++i)
-        ans = (ans * i) % MOD;
+    int ans = 0;
+    while (n) {
+        ans += n/p;
+        n/=p;
+    }
     return ans;
 }
 
-int dblfact(int n)
+int ppfact(int n, int p)
 {
-    int64 ans = 1;
-    for (int i=2; i<=n; ++i)
-        ans = (ans * fact(i)) % MOD;
-    return ans;
+    assert(memo.count(n));
+    return memo[n];
+}
+
+void init(int n, int p)
+{
+    int cur = 1;
+    for (int i=1; i<=n; ++i) {
+        int k = i;
+        while (k % p == 0) k /= p;
+        cur = cur * k % p;
+        if (memo.count(i)) memo[i] = cur;
+    }
 }
 
 int fastpow(int a, int b)
 {
-    int64 ans = 1;
-    int64 base = a;
+    int ans = 1;
+    int base = a;
     while (b) {
         if (b&1) ans = (ans * base) % MOD;
         base = base * base % MOD;
@@ -57,20 +71,38 @@ int inv(int a)
 int main()
 {
     int N; cin >> N;
-    if (N >= MOD) { cout << 0 << endl; return 0; }  // why count must be a multiple of N, No it is not
-    int64 ans = 0;
+    int ans = 0;
     for (int d = 1; (int64)d * d <= N; ++d)
     if (N % d == 0)
     {
-        int p, q, deno;
-        int64 cur;
+        memo[N / d] = 0;
+    }
+    init(N, MOD);
+
+    int pre, cnt;
+    pre = ppfact(N, MOD);
+    cnt = count_pow(N, MOD);
+    for (int d = 1; (int64)d * d <= N; ++d)
+    if (N % d == 0)
+    {
+        int p, q;
         p = d, q = N / d;
-        //deno = dblfact(p+q-1);
-        //cur = fact(N) * (int64)dblfact(p-1) * dblfact(q-1) % MOD * inv(deno) % MOD;
-        cur = 1;
-        for (int k=0; k<p; ++k)
-            cur = cur * fact(q + k) * inv(fact(k)) % MOD;
-        cur = fact(N) * inv(cur) % MOD;
+
+        int prod = 1;
+        int term = ppfact(q, MOD);
+        int bottom = count_pow(q, MOD);
+        for (int i=1; i<=p; ++i) {
+            prod = prod * term % MOD;
+            int next = q+i;
+            while (next % MOD == 0) { bottom++; next /= MOD; }
+            term = term * next % MOD;
+            int k = i;
+            while (k % MOD == 0) { bottom--; k /= MOD; }
+            term = term * inv(k) % MOD;
+        }
+        int cur;
+        if (cnt > bottom) { cur = 0; }
+        else { cur = pre * inv(prod) % MOD; }
 
         if (p == q) ans += cur;
         else ans += cur + cur;

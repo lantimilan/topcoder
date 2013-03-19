@@ -40,5 +40,104 @@
 // For 100 testcases we need 100 * 5 * 10^5 = 5 * 10^7 time
 //
 // this concludes the algorithm analysis of this problem
+//
+// Actually NO, each vote can conflict with every other vote so edge could be
+// as many as 500^2, then it is too slow for 100 testcases
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cassert>
+#include <cstring>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+using namespace std;
+
+pair<string, string> votes[505];
+vector<int> adj[505];
+int parity[505];
+int mate[505];
+int vis[505];
+int C, D, V;
+
+bool dfs(int s, int p)
+{
+    parity[s] = p;
+    for (int x = 0; x < adj[s].size(); ++x) {
+        int b = adj[s][x];
+        if (parity[b] < 0) {
+            bool next = dfs(b, 1-p);
+            if (!next) return false;
+        } else {
+            if (parity[b] == parity[s]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool is_bipartite()
+{
+    memset(parity, -1, sizeof parity);
+    for (int i = 0; i < V; ++i) if (parity[i] < 0)
+        if (!dfs(i, 0)) return false;
+    return true;
+}
+
+bool augment(int s)
+{
+    vis[s] = 1;
+    for (int x = 0; x < adj[s].size(); ++x) {
+        int b = adj[s][x];
+        if (mate[b] < 0) {
+            mate[s] = b; mate[b] = s; return true;
+        } else {
+            int d = mate[b];
+            if (!vis[d] && augment(d)) {
+                mate[s] = b; mate[b] = s; return true;
+            }
+        }
+    }
+    return false;
+}
+
+int matching()
+{
+    memset(mate, -1, sizeof mate);
+    int ans = 0;
+    bool update = true;
+    while (update) {
+        update = false;
+        memset(vis, 0, sizeof vis);
+        for (int s = 0; s < V; ++s) if (mate[s] < 0) {
+            if (augment(s)) { update = true; ans++; break; }
+        }
+    }
+    return ans;
+}
+
+int main()
+{
+    int T; cin >> T;
+    while (T--) {
+        cin >> C >> D >> V;
+        //cout << C << ' ' << D << ' ' << V << endl;
+        for (int i = 0; i < V; ++i) {
+            string keep, away;
+            cin >> keep >> away;
+            votes[i] = make_pair(keep, away);
+        }
+        for (int i = 0; i < V; ++i) adj[i].clear();
+        for (int i = 0; i < V; ++i)
+        for (int j = i+1; j < V; ++j)
+        if (votes[i].first == votes[j].second || votes[i].second == votes[i].first)
+        {
+            adj[i].push_back(j);
+            adj[j].push_back(i);
+        }
+        assert(is_bipartite());
+        int m = matching();
+        cout << V - m << endl;
+    }
+}

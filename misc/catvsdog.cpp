@@ -131,7 +131,8 @@ int main()
         for (int i = 0; i < V; ++i) adj[i].clear();
         for (int i = 0; i < V; ++i)
         for (int j = i+1; j < V; ++j)
-        if (votes[i].first == votes[j].second || votes[i].second == votes[i].first)
+        if (votes[i].first == votes[j].second ||
+            votes[i].second == votes[j].first)
         {
             adj[i].push_back(j);
             adj[j].push_back(i);
@@ -142,4 +143,15 @@ int main()
     }
 }
 
-// got WA
+// Result for "catvsdog": Accepted
+// Honorable Judge Kattis <puzzle@spotify.se>;
+//
+//  Hello Li Yan,
+
+// Thank you for submitting a solution to our problem "catvsdog"!
+
+// We have tested your solution, and we are happy to report that it
+// solved the problem!  We hope you had as fun with it as we did.
+//
+// Accepted
+// got WA, found a typo in line 134, should be votes[j] instead of votes[i]

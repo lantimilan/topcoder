@@ -78,8 +78,8 @@ int main()
                     prev = max(prev, d[j]);
                 } else {
                     if (log2(a[j]) < log2(a[i])) {
-                        cout << a[j] << ' ' << log2(a[j])
-                            << ' ' << a[i] << ' ' << log2(a[i]) << endl;
+                        //cout << a[j] << ' ' << log2(a[j])
+                        //    << ' ' << a[i] << ' ' << log2(a[i]) << endl;
                         prev = max(prev, d[j]);
                     }
                 }
@@ -93,3 +93,5 @@ int main()
     }
     cout << n - ans << endl;
 }
+
+// WA, output 1258, answer 841

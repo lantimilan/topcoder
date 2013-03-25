@@ -35,6 +35,14 @@ public:
         return ans1 || ans2;
     }
 
+    bool cross(int a, int b, vector<int> list) {
+        for (int i = 0; i+1 < list.size(); ++i) {
+            if (intersect(a, b, list[i], list[i+1]))
+                return true;
+        }
+        return false;
+    }
+
     int count(int N, vector <int> points) 
     { 
         int start = points.size();
@@ -47,23 +55,23 @@ public:
         while (points.size() >= start) {
             int node = points.back();
             int k = neighbor[node];
-            for (++k; k <= N; ++k) if (node != k) {
-                bool good = false;
-                for (int j = 0; j+2 < points.size(); ++j) {
-                    if (k != points[j] && k != points[j+1] && intersect(node, k, points[j], points[j+1])) {
-                        good = true; break;
-                    }
-                }
-                if (!good) continue;
-                if (k == points[0] && points.size() == N) {
-                    // terminal state
-                    ans++;
-                    k = N+1;
-                    break;
-                } else if (!inuse[k]) {
-                    points.push_back(k);
-                    inuse[k] = 1;
-                    break;
+            if (points.size() == N) {  // all nodes in path
+                //vector<int> tmp = points;
+                //tmp.pop_back(); tmp.erase(tmp.begin());
+                vector<int> tmp(points.size() - 2);
+                vector<int>::iterator it1, it2;
+                it1 = points.begin(); it2 = points.end();
+                //copy(++it1, --it2, tmp.begin());
+                copy(++points.begin(), --points.end(), tmp.begin());
+                if (cross(points[0], points[N-1], tmp)) { ans++; }
+                k = N+1;  // terminate this search path
+            } else {
+                // look for next node in path
+                for (++k; k <= N; ++k) if (!inuse[k]) {
+                vector<int> tmp = points; tmp.pop_back();
+
+                bool good = cross(node, k, tmp);
+                if (good) { points.push_back(k); inuse[k] = 1; break; }
                 }
             }
             if (k > N) {
@@ -77,26 +85,11 @@ public:
         return ans;
     } 
     
-// BEGIN CUT HERE
-	public:
-	void run_test(int Case) { if ((Case == -1) || (Case == 0)) test_case_0(); if ((Case == -1) || (Case == 1)) test_case_1(); if ((Case == -1) || (Case == 2)) test_case_2(); if ((Case == -1) || (Case == 3)) test_case_3(); if ((Case == -1) || (Case == 4)) test_case_4(); }
-	private:
-	template <typename T> string print_array(const vector<T> &V) { ostringstream os; os << "{ "; for (typename vector<T>::const_iterator iter = V.begin(); iter != V.end(); ++iter) os << '\"' << *iter << "\","; os << " }"; return os.str(); }
-	void verify_case(int Case, const int &Expected, const int &Received) { cerr << "Test Case #" << Case << "..."; if (Expected == Received) cerr << "PASSED" << endl; else { cerr << "FAILED" << endl; cerr << "\tExpected: \"" << Expected << '\"' << endl; cerr << "\tReceived: \"" << Received << '\"' << endl; } }
-	void test_case_0() { int Arg0 = 5; int Arr1[] = {1, 3, 5}; vector <int> Arg1(Arr1, Arr1 + (sizeof(Arr1) / sizeof(Arr1[0]))); int Arg2 = 1; verify_case(0, Arg2, count(Arg0, Arg1)); }
-	void test_case_1() { int Arg0 = 6; int Arr1[] = {1, 4, 2}; vector <int> Arg1(Arr1, Arr1 + (sizeof(Arr1) / sizeof(Arr1[0]))); int Arg2 = 1; verify_case(1, Arg2, count(Arg0, Arg1)); }
-	void test_case_2() { int Arg0 = 7; int Arr1[] = {2, 4, 7}; vector <int> Arg1(Arr1, Arr1 + (sizeof(Arr1) / sizeof(Arr1[0]))); int Arg2 = 2; verify_case(2, Arg2, count(Arg0, Arg1)); }
-	void test_case_3() { int Arg0 = 7; int Arr1[] = {1, 2, 3, 4, 6, 5}; vector <int> Arg1(Arr1, Arr1 + (sizeof(Arr1) / sizeof(Arr1[0]))); int Arg2 = 0; verify_case(3, Arg2, count(Arg0, Arg1)); }
-	void test_case_4() { int Arg0 = 11; int Arr1[] = {1, 5, 10}; vector <int> Arg1(Arr1, Arr1 + (sizeof(Arr1) / sizeof(Arr1[0]))); int Arg2 = 1412; verify_case(4, Arg2, count(Arg0, Arg1)); }
-
-// END CUT HERE
  
 }; 
 
-// BEGIN CUT HERE 
-int main()
-{
-    PolygonTraversal2 __test; 
-    __test.run_test(-1); 
-} 
-// END CUT HERE 
+
+
+// Powered by FileEdit
+// Powered by TZTester 1.01 [25-Feb-2003]
+// Powered by CodeProcessor

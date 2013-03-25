@@ -56,12 +56,7 @@ public:
             int node = points.back();
             int k = neighbor[node];
             if (points.size() == N) {  // all nodes in path
-                //vector<int> tmp = points;
-                //tmp.pop_back(); tmp.erase(tmp.begin());
                 vector<int> tmp(points.size() - 2);
-                vector<int>::iterator it1, it2;
-                it1 = points.begin(); it2 = points.end();
-                //copy(++it1, --it2, tmp.begin());
                 copy(++points.begin(), --points.end(), tmp.begin());
                 if (cross(points[0], points[N-1], tmp)) { ans++; }
                 k = N+1;  // terminate this search path

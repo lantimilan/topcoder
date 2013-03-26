@@ -17,8 +17,8 @@ using namespace std;
 #define sz(a) int(a.size())
 
 class PolygonTraversal2
-{ 
-public: 
+{
+public:
     bool inrange(int lo, int hi, int val)
     {
 //    cout << "inrange " << lo << ' ' << hi << ' ' << val << endl;
@@ -43,8 +43,8 @@ public:
         return false;
     }
 
-    int count(int N, vector <int> points) 
-    { 
+    int count(int N, vector <int> points)
+    {
         int start = points.size();
         int neighbor[20] = {0};
         int inuse[20] = {0};
@@ -78,10 +78,8 @@ public:
             }
         }
         return ans;
-    } 
-    
- 
-}; 
+    }
+};
 
 
 

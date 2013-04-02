@@ -7,7 +7,7 @@
 // by multiplying by K factorial
 //
 // Now our job is to count number of sequence of K elements with mod M ordered increasingly
-// if N is small, then we can use dp to count dp[sum][x][l] for number of sequences with 
+// if N is small, then we can use dp to count dp[sum][x][l] for number of sequences with
 // total = sum and use only mod M from 0 to x-1, with exactly l elements
 // however N is huge, 10^18, so we need to work with N mod M somehow
 //
@@ -15,7 +15,7 @@
 // S[1] + S[2] + ... + S[K] = N
 // this is true if and only if
 // sum of (S[i] % M) = N % M + S / M  where S = sum of S[i]
-// and 
+// and
 // sum of (S[i] / M) = N / M - S / M
 //
 // if we write S[i] = Q[i] * M + R[i]
@@ -60,13 +60,14 @@ int mult(int a, int b)
 int gcd(long long a, long long b)  // use long long even though only one of them can be long long
 {
 	if (b == 0) return a;
-	return gcd(b, a % b);	
+	return gcd(b, a % b);
 }
 
 int choose(long long a, int b)  // compute (Q + K-1 choose K-1), K is at most 50, although Q can be 10^18
 {
 	int ans = 1;
-	/*
+	/* this one works too, although a bit slower
+    *************************************************
 	vector<int> v;
 	for (int i=1; i<=b; ++i) v.push_back(i);
 	for (int i = 0; i < b; ++i) {
@@ -134,7 +135,7 @@ int howMany(long long N, int M)
 			if (dp[sum][x][l] >= MOD) dp[sum][x][l] -= MOD;
 		}
 		//cout << K << endl;
-		
+
 		int cur = 0;
 		for (int sum = 0; sum < M*M/2 && sum <= N; ++sum)  // careful, sum can only be up to N
 		if (sum % M == N % M) {
@@ -147,7 +148,7 @@ int howMany(long long N, int M)
 			//}
 		}
 		refadd(ans, mult(cur, fact[K]));
-		
+
 	}
 	return ans;
 }

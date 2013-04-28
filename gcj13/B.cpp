@@ -10,7 +10,7 @@
 //
 // int64 calc(int begin, int end, int level)  // profit of [begin, end) with a[end] must be level
 // not working ??
-// is it implementation fault or algorithm wrong?
+// is it implementation fault or algorithm wrong? implementation wrong
 
 #include <iostream>
 using namespace std;

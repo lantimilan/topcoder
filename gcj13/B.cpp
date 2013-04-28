@@ -29,12 +29,12 @@ int64 calc(int begin, int end, int64 level)
     int64 cap;
     if (begin == 0) cap = E;
     else {
-        cap = min(E, R * (pos+1 - begin));
+        cap = min(E, R * (pos+1 - begin));  // careful here, only accumulate from begin-1 to pos-1
     }
     for (int i = pos-1, sub = cap-R; i >= begin && sub > 0; --i, sub -= R)
         need[i] = max(need[i], sub);
     int64 curr = val[pos] * (cap - need[pos]);
-    if (curr < 0) curr = 0;
+    if (curr < 0) curr = 0;  // careful here, no gain but not negative
     //cout << "calc " << begin << ' ' << end << ' ' << level << ' ' << curr << ' ' << need[pos] << endl;
     return calc(begin, pos, cap) + curr + calc(pos+1, end, level);
 }

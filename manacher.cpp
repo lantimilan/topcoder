@@ -3,6 +3,7 @@
 // Manacher's algorithm
 // O(n) time finds all palindrome substring
 
+#include <cassert>
 #include <iostream>
 using namespace std;
 
@@ -15,6 +16,7 @@ void manacher(string s, int span[])
         int j = 2*c - i;
         if (j < 0) span[i] = 0;
         else span[i] = min(c+span[c]-i, span[j]);
+        if (span[i] < 0) span[i] = 0;
         int l = c - span[c];
         int l1 = j - span[j];
         if (l1 <= l) {
@@ -29,13 +31,60 @@ void manacher(string s, int span[])
     }
 }
 
-int main()
+void manacher2(const string &s, int len[])
 {
-    string s = "abababaababasa";
-    int span[7];
-    manacher(s, span);
-    for (int i = 0; i < 7; ++i) {
-        cout << span[i] << ' ';
+    int n = s.size();
+    int c[2] = {0, 1};
+
+    for (int i = 0; i < 2*n; ++i) len[i] = 0;
+    len[0] = 0; len[1] = 1;
+
+    for (int i = 2; i < 2*n; ++i) {
+        int k = c[i&1];
+        int l1, l, r, p, q;
+        int j = 2*k - i;
+
+        l1 = n;
+        l = (k-len[k])/2;
+        r = (k+len[k])/2 - 1;
+        if (j<0) { len[i] = i & 1; l = i/2; r = (i-1)/2; }
+        else {
+            len[i] = min(len[j], 2*r - i + 2);
+            l1 = (j-len[j])/2;
+        }
+        p = l-1; q = r+1;
+        while (0 <= p && q < n && s[p] == s[q]) {
+            p--; q++;
+        }
+        len[i] = q-p-1;
+        if (l1 <= l) c[i&1] = i;
+    }
+    cout << "pal len[]\n";
+    for (int i = 0; i < 2*n; ++i) {
+        if (i&1) cout << ' ' << s[i/2];
     }
     cout << endl;
+    for (int i = 0; i < 2*n; ++i) if (i&1) {
+        cout << ' ' << len[i];
+    }
+    cout << endl;
+    for (int i = 0; i < 2*n; ++i) if (i%2 == 0) {
+        cout << ' ' << len[i];
+    }
+    cout << endl;
+}
+
+int main()
+{
+    string s = "aabbababaababassaa";
+    int span[30];
+    manacher(s, span);
+    for (int i = 0; i < s.size(); ++i) {
+        int sp = span[i];
+        cout << sp << ' ';
+    }
+    cout << endl;
+
+    int len[30];
+    manacher2(s, len);
 }

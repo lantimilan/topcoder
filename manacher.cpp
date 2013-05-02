@@ -31,7 +31,7 @@ void manacher(string s, int span[])
     }
 }
 
-void manacher2(const string &s, int len[])
+void manacher2(const string &s, int len[], int flag=false)
 {
     int n = s.size();
     int c[2] = {0, 1};
@@ -44,21 +44,26 @@ void manacher2(const string &s, int len[])
         int l1, l, r, p, q;
         int j = 2*k - i;
 
-        l1 = n;
         l = (k-len[k])/2;
         r = (k+len[k])/2 - 1;
-        if (j<0) { len[i] = i & 1; l = i/2; r = (i-1)/2; }
-        else {
+        if (j<0) {
+            len[i] = i & 1;
+            l = i/2; r = (i-1)/2;
+            l1 = -1;
+        } else {
             len[i] = min(len[j], 2*r - i + 2);
+            len[i] = max(len[i], i&1);
             l1 = (j-len[j])/2;
         }
-        p = l-1; q = r+1;
+        if (l1 > l) continue;  // left image within boundary, len[i] fixed
+        p = r-len[i]; q = r+1;
         while (0 <= p && q < n && s[p] == s[q]) {
             p--; q++;
         }
         len[i] = q-p-1;
-        if (l1 <= l) c[i&1] = i;
+        if (q-1 > r) c[i&1] = i;  // move center to next pos
     }
+    if (flag) {  // show result
     cout << "pal len[]\n";
     for (int i = 0; i < 2*n; ++i) {
         if (i&1) cout << ' ' << s[i/2];
@@ -72,11 +77,12 @@ void manacher2(const string &s, int len[])
         cout << ' ' << len[i];
     }
     cout << endl;
+    }
 }
 
 int main()
 {
-    string s = "aabbababaababassaa";
+    string s = "abababababassaa";
     int span[30];
     manacher(s, span);
     for (int i = 0; i < s.size(); ++i) {
@@ -86,5 +92,12 @@ int main()
     cout << endl;
 
     int len[30];
-    manacher2(s, len);
+    manacher2(s, len, true);
+    manacher2("a", len);
+    manacher2("", len);
+
+    // test large
+    int large[200000*2+5];
+    string slarge(200000, 'a');
+    manacher2(slarge, large);
 }

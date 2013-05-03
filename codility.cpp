@@ -103,3 +103,33 @@ int solution ( const string &s) {
     return ans;
 }
 
+//  1. min_abs_sum
+// Given array of integers, find the lowest absolute sum of elements.
+#include <algorithm>
+#include <cstring>
+// you never need to remember difference more than 100, the max element
+int dp[20000+5][205];
+int OFFSET = 100;
+int solution ( const vector<int> &A ) {
+    memset(dp, 0, sizeof dp);
+    int N = A.size();
+    dp[0][OFFSET] = 1;
+    for (int i = 1; i <= N; ++i)
+        for (int sum = 0; sum <= 200; sum++) {
+            int prev, val;
+            val = abs(A[i-1]);
+            prev = sum - val;
+            if (0 <= prev && prev <= 200 && dp[i-1][prev])
+                dp[i][sum] = 1;
+            prev = sum + val;
+            if (0 <= prev && prev <= 200 && dp[i-1][prev])
+                dp[i][sum] = 1;
+        }
+    int best = 200;
+    for (int sum = 0; sum <= 200; sum++) if (dp[N][sum]) {
+        int val = abs(sum - OFFSET);
+        best = min(best, val);
+    }
+    return best;
+}
+

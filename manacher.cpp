@@ -2,6 +2,9 @@
 //
 // Manacher's algorithm
 // O(n) time finds all palindrome substring
+//
+// manacher computes odd palindrome
+// manacher2 computes all palindrome
 
 #include <cassert>
 #include <iostream>
@@ -33,6 +36,7 @@ void manacher(string s, int span[])
 
 void manacher2(const string &s, int len[], int flag=false)
 {
+    if (s.empty()) return;  // empty string
     int n = s.size();
     int c[2] = {0, 1};
 
@@ -46,13 +50,13 @@ void manacher2(const string &s, int len[], int flag=false)
 
         l = (k-len[k])/2;
         r = (k+len[k])/2 - 1;
-        if (j<0) {
+        if (i/2 > r) {  // s[pos] out of range of center
             len[i] = i & 1;
             l = i/2; r = (i-1)/2;
             l1 = -1;
-        } else {
+        } else {  // s[pos] within range of center
             len[i] = min(len[j], 2*r - i + 2);
-            len[i] = max(len[i], i&1);
+            assert(j >= 0);
             l1 = (j-len[j])/2;
         }
         if (l1 > l) continue;  // left image within boundary, len[i] fixed
@@ -92,6 +96,7 @@ int main()
     cout << endl;
 
     int len[30];
+    s = "caabbbaa";
     manacher2(s, len, true);
     manacher2("a", len);
     manacher2("", len);

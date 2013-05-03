@@ -19,7 +19,7 @@ int solution ( int A[], int N ) {
 
 
 // 1. number_of_disc_intersections
-// Compute intersections between sequence of discs. 
+// Compute intersections between sequence of discs.
 // you can also use includes for example:
 #include <algorithm>
 int binsearch(const vector<long long> &vec, long long val)
@@ -54,3 +54,52 @@ int solution ( const vector<int> &A ) {
     }
     return cnt;
 }
+
+
+// count number of palindrome substrings with length >= 2
+// you can also use includes for example:
+// #include <algorithm>
+#include <vector>
+#include <cassert>
+
+int solution ( const string &s) {
+    if (s.empty()) return 0;
+    int n = s.size();
+    int c[2] = {0, 1};
+    vector<int> len(2*n);
+
+    for (int i = 0; i < 2*n; ++i) len[i] = 0;
+    len[0] = 0; len[1] = 1;
+
+    for (int i = 2; i < 2*n; ++i) {
+        int k = c[i&1];
+        int l1, l, r, p, q;
+        int j = 2*k - i;
+
+        l = (k-len[k])/2;
+        r = (k+len[k])/2 - 1;
+        if (i/2 > r) {  // s[pos] out of range of center
+            len[i] = i & 1;
+            l = i/2; r = (i-1)/2;
+            l1 = -1;
+        } else {  // s[pos] within range of center
+            len[i] = min(len[j], 2*r - i + 2);
+            assert(j >= 0);
+            l1 = (j-len[j])/2;
+        }
+        if (l1 > l) continue;  // left image within boundary, len[i] fixed
+        p = r-len[i]; q = r+1;
+        while (0 <= p && q < n && s[p] == s[q]) {
+            p--; q++;
+        }
+        len[i] = q-p-1;
+        if (q-1 > r) c[i&1] = i;  // move center to next pos
+    }
+    int ans = 0;
+    for (int i = 0; i < 2*n; ++i) {
+        ans += len[i]/2;
+        if (ans > 1e8) return -1;
+    }
+    return ans;
+}
+

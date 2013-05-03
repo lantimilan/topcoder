@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include <cstring>
+#include <iostream>
 using namespace std;
 
 const int MOD = 1e9+7;
@@ -27,10 +28,12 @@ vector<int> getvec(const vector<string> &vec)
 int count(int N, vector <string> L, vector <string> R)
 {
 	vector<int> left, right;
-	left = getvec(L);
+	left = getvec(L); //cout << left[0] << ' ' << left[1] << endl;
 	right = getvec(R);
 
 	memset(contained, 0, sizeof contained);
+	memset(dp, 0, sizeof dp);
+
 	for (int i = 1; i <= N; ++i)
 	for (int j = i+1; j <= N; ++j)
 	{
@@ -42,17 +45,16 @@ int count(int N, vector <string> L, vector <string> R)
 		}
 		contained[i][j] = inside;
 	}
-	for (int i = 0; i <= N; ++i) dp[0][i] = 1;
 
+	for (int i = 0; i <= N; ++i) dp[0][i] = 1;  // 0 and 1 wolf
+	// 2 or more wolves and last two at l and r
 	for (int r = 1; r <= N; ++r)
 	for (int l = 1; l < r; ++l)
 	{
-		if (contained[l][r]) dp[l][r] += dp[0][l];
-		else {
-			for (int p = 0; p < l; ++p) {
-				dp[l][r] += dp[p][l];
-				if (dp[l][r] >= MOD) dp[l][r] -= MOD;
-			}
+		dp[l][r] += dp[0][l];
+		for (int p = 1; p < l; ++p) if (!contained[p][r]) {
+			dp[l][r] += dp[p][l];
+			if (dp[l][r] >= MOD) dp[l][r] -= MOD;
 		}
 	}
 	int ans = 0;
@@ -62,8 +64,9 @@ int count(int N, vector <string> L, vector <string> R)
 		ans += dp[l][r];
 		if (ans >= MOD) ans -= MOD;
 	}
-	return ans;
+	return (ans+1)%MOD;
 }
 };
 
+// PASS system test
 // cannot finish during contest

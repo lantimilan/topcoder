@@ -2,6 +2,7 @@
 //
 // implements a Red-Black tree
 
+#include <iomanip>
 #include <iostream>
 using namespace std;
 
@@ -13,13 +14,17 @@ template<class T>
 class RBTree
 {
 private:
+    static const int INDENT = 4;
     void print(RBTreeNode<T> *node, int level);
     void dumprec(RBTreeNode<T> *node, int level);
+    RBTreeNode<T>* insert_rec(T val, RBTreeNode<T> *node);
 public:
     RBTreeNode<T> *root;
     RBTree();
     RBTree(RBTreeNode<T> *node);
     void dump();
+
+    RBTreeNode<T>* insert(T val);
 };
 
 template<class T>
@@ -38,9 +43,10 @@ template<class T>
 void RBTree<T>::print(RBTreeNode<T> *node, int level)
 {
     for (int i = 0; i < level; ++i) {
-        cout << "  ";
+        for (int k = 0; k < INDENT; ++k)
+            cout << ' ';
     }
-    cout << node->val << endl;
+    cout << setw(4) << node->val << endl;
 }
 
 template<class T>
@@ -59,12 +65,44 @@ void RBTree<T>::dump()
     dumprec(root, 0);
 }
 
+template<class T>
+RBTreeNode<T>*
+RBTree<T>::insert(T val)
+{
+    if (root == NULL) {
+        return root = new RBTreeNode<T>(val);
+    } else {
+        return insert_rec(val, root);
+    }
+}
+
+template<class T>
+RBTreeNode<T>*
+RBTree<T>::insert_rec(T val, RBTreeNode<T> *node)
+{
+    if (node->val < val) {
+        if (node->right == NULL) {
+            return node->right = new RBTreeNode<T>(val);
+        } else {
+            return insert_rec(val, node->right);
+        }
+    } else if (node->val > val) {
+        if (node->left == NULL) {
+            return node->left = new RBTreeNode<T>(val);
+        } else {
+            return insert_rec(val, node->left);
+        }
+    } else {
+        // ignore if equal
+    }
+}
+
+// RBTreeNode class
 enum RBColor {
     RED,    // 0
     BLACK,  // 1
 };
 
-// RBTreeNode class
 template<class T>
 class RBTreeNode
 {
@@ -117,4 +155,29 @@ int main()
     RBTreeNode<int> *node = new RBTreeNode<int>(10);
     RBTree<int> *rbtree = new RBTree<int>(node);
     rbtree->dump();
+    cout << "--------------------------\n";
+
+    cout << endl;
+    cout << "insert 5\n";
+    rbtree->insert(5);
+    rbtree->dump();
+    cout << "--------------------------\n";
+
+    cout << endl;
+    cout << "insert 15\n";
+    rbtree->insert(15);
+    rbtree->dump();
+    cout << "--------------------------\n";
+
+    cout << endl;
+    cout << "insert 8\n";
+    rbtree->insert(8);
+    rbtree->dump();
+    cout << "--------------------------\n";
+
+    cout << endl;
+    cout << "insert 4\n";
+    rbtree->insert(4);
+    rbtree->dump();
+    cout << "--------------------------\n";
 }

@@ -1,0 +1,13 @@
+#########################
+vim magic:
+#########################
+
+insert filename: C-r, %
+
+intellisense: C-x, C-p or C-n
+
+
+#########################
+emacs
+#########################
+show-paren-mode

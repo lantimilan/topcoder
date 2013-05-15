@@ -11,3 +11,6 @@ intellisense: C-x, C-p or C-n
 emacs
 #########################
 show-paren-mode
+
+## reload .emacs without quit
+load-file

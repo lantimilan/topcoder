@@ -34,7 +34,8 @@ void add(int index, int val)
     int x = index;
     s[++x] += val;
     while (x <= n) {
-        x += (x & -x);  // add lsb, the right most 1
+//        x += (x & -x);  // add lsb, the right most 1, this one works
+        x += ((x & x-1) ^ x);  // add lsb, the right most 1
         s[x] += val;
     }
 }

@@ -18,6 +18,15 @@
 // then it is very easy
 // the count is 2^k where k is the number of elems that div g
 //
+//
+// for 1D memmory
+// dp[0..mx]
+// to update with A[pos]
+// for g = 1 to A[pos-1], larger g cannot have dp[][] > 0 as A[] sorted
+//    dp[gcd(g, A[pos])] += dp[g]
+
+// when compute dp[g]
+// need dp[g+1..mx] not touched, and order from g=1 to mx achieves exactly that
 
 #include <algorithm>
 #include <cassert>

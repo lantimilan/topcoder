@@ -14,3 +14,9 @@ show-paren-mode
 
 ## reload .emacs without quit
 load-file
+
+
+########################
+source code prettier
+
+astyle

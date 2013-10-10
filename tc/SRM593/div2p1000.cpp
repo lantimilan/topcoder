@@ -59,8 +59,18 @@ using namespace std;
 //
 // score can be as low as -smin, and as high as +smax
 
+// finally I have a dp that does not use offset
+// consider a partition/configuration such that min1 - max2 > 0 and is valid,
+// then max2 - min1 < 0
+// and we also have max1 - min2 + max2 - min1 >= 0 because smax - smin >= 0
+// then max1 - min2 >= 0 in this case
+// it is also true that max1 - min2 >= min1 - max2 because smax - smin >= 0
+// so abs(max1 - min2) >= abs(max2 - min1), so max1 - min2 must be valid
+// therefore we can remember only positive values
+// the values are at most 50*10000
+
 const int D = 50*10000;
-bool dp[2][2*D+3];
+bool dp[2][D];
 
 class MayTheBestPetWin
 {
@@ -75,9 +85,9 @@ int calc(vector <int> A, vector <int> B)
         smax[i+1] = smax[i] + B[i];
     }
     int N = A.size();
-    int cap = smin[N] + smax[N];
-    int diff = smin[N];
-    dp[0][diff] = true;
+    int cap = smax[N];
+
+    dp[0][0] = true;
     for (int i = 0; i < A.size(); ++i) {
         //cout << "iter " << i << endl;
         int p1 = i&1;
@@ -85,17 +95,15 @@ int calc(vector <int> A, vector <int> B)
         memset(dp[p2], 0, sizeof(dp[p2])); //cout << "memset done" << endl;
         for (int d = 0; d <= cap; ++d) if (dp[p1][d]) {
             int s1, s2, t1, t2;
-            s1 = d - diff; s2 = smax[i] - smin[i] - s1;
+            s1 = d; s2 = smax[i] - smin[i] - s1;
             // use A[i], B[i] in team max
             t1 = s1 + B[i]; t2 = s2 - A[i];
-            t1 = (abs(t1) >= abs(t2)) ? t1 : t2;
-            t1 += diff;
+            t1 = max(t1, t2);
             assert(0 <= t1 && t1 <= cap);
             dp[p2][t1] = true;
             // use A[i],B[i] in team min
             t1 = s1 - A[i]; t2 = s2 + B[i];
-            t1 = (abs(t1) >= abs(t2)) ? t1 : t2;
-            t1 += diff;
+            t1 = max(t1, t2);
             assert(0 <= t1 && t1 <= cap);
             dp[p2][t1] = true;
         }
@@ -103,7 +111,7 @@ int calc(vector <int> A, vector <int> B)
     int best = 2*D;
     for (int d = 0; d <= cap; ++d) {
         if (dp[A.size()&1][d]) {
-            best = min(best, abs(d - diff));
+            return d;
         }
     }
     return best;

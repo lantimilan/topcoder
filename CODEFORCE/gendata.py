@@ -1,12 +1,9 @@
 import sys, random;
 
-n=280; q=279; t=97857
-print n, q, t
-
-a=100000
+n = 70000
+s = n
+t = 2
+print n, s
 for i in range(n):
-    print a,
+    print t,
 print
-for i in range(q):
-    print i+1, i+2
-

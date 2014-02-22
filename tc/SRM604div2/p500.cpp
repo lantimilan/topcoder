@@ -25,7 +25,7 @@ string ableToGet(int x, int y)
 {
 	const string good = "Possible";
 	const string bad = "Impossible";
-	if (x == 0 && y == 0) return good;	
+
 	int maskX = 0, maskY = 0;
 	if (!getMask(x, maskX)) return bad;
 	if (!getMask(y, maskY)) return bad;

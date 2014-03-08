@@ -1,0 +1,7 @@
+
+mvn compile
+
+mvn package
+mvn install
+
+java -jar target/spring-hello-0.1.0.jar

@@ -1,0 +1,18 @@
+// Given a table A of N integers from 0 to N-1 calculate the smallest such index P, that that {A[0],...,A[N-1]} = {A[0],...,A[P]}.
+int solution ( int A[], int N ) {
+    int used[1000000+5] = {0};
+    int taken[1000000+5] = {0};
+
+    int i, cnt=0;
+    for (i = 0; i < N; ++i) {
+        if (used[A[i]] == 0) cnt++;
+        used[A[i]] = 1;
+    }
+    for (i = 0; i < N; ++i) {
+        if (taken[A[i]] == 0) {
+            cnt--; taken[A[i]] = 1;
+        }
+        if (cnt == 0) break;
+    }
+    return i;
+}

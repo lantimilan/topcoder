@@ -18,36 +18,34 @@
 #include <set>
 using namespace std;
 
-set<int> X;
-set<int> Y;
+const int M = 1e6;
+int used[M+1];
+int ans[M+1];
 
 int main()
 {
-    const int M = 1e6;
     int n; scanf("%d", &n);
     int m = n; printf("%d\n", m);
     for (int i = 0; i < n; ++i) {
         int x; scanf("%d", &x);
-        X.insert(x);
+        used[x] = 1;
     }
-    set<int>::iterator it;
-    for(it = X.begin(); it != X.end(); ++it) {
-        int v = *it;
-        int v2 = M + 1 - v;
-        if (!X.count(v2)) { Y.insert(v2); }
-    }
-    assert(Y.size() <= m);
-    if (Y.size() < m) for (int i = 1; i <= M; ++i) {
-        if (!X.count(i) && !X.count(M+1-i)) {
-            Y.insert(i);
-            Y.insert(M+1-i);
+    for (int i = 1; i <= M; ++i) {
+        if (used[i] && !used[M+1-i]) {
+            ans[--m] = M+1-i;
+            used[M+1-i] = 1;
         }
-        if (Y.size() >= m) break;
     }
-    assert(Y.size() == m);
-    for (it = Y.begin(); it != Y.end(); ++it) {
-        if (it != Y.begin()) putchar(' ');
-        printf("%d", *it);
+    for (int i = 1; i <= M; ++i) if (m > 0) {
+        if (!used[i]) {
+            ans[--m] = i;
+            ans[--m] = M+1-i;
+            used[i] = used[M+1-i] = 1;
+        }
+    }
+    for (int i = 0; ans[i]; ++i) {
+        if (i) putchar(' ');
+        printf("%d", ans[i]);
     }
     putchar('\n');
 }

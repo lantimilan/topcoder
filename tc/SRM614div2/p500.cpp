@@ -13,7 +13,7 @@ long long minArea(vector <int> x, vector <int> y)
 	for (int i = 0; i < x.size(); ++i) {
 		for (int j = i+1; j < x.size(); ++j) {
 			vector<int> xx, yy;
-			for (int t = 0; t < x.size(); ++t) 
+			for (int t = 0; t < x.size(); ++t)
 				if (t != i && t != j) {
 					xx.push_back(x[t]);
 					yy.push_back(y[t]);
@@ -61,7 +61,7 @@ long long solve(vector<int> x, vector<int> y)
 		// xx2-s, xx2, yy1, yy1+s
 		if (check(xx2-s, xx2, yy1, yy1+s, x, y)) ans = min(ans, s);
 		// xx1, xx1+s, yy2-s, yy2
-		if (check(xx1, xx1+s, yy2-s, yy2, x, y)) ans = min(ans, s);		
+		if (check(xx1, xx1+s, yy2-s, yy2, x, y)) ans = min(ans, s);
 		// xx2-s, xx2, yy2-s, yy2
 		if (check(xx2-s, xx2, yy2-s, yy2, x, y)) ans = min(ans, s);
 	}
@@ -77,3 +77,9 @@ bool check(int x1, int x2, int y1, int y2, const vector<int> &x, const vector<in
 	return true;
 }
 };
+
+// why div1 is hard
+// the problem in div1 is for N = 100, and any k <= N
+// this makes the above solution useless
+// the solution to the harder version is to use x1, x2 and sort y[i]'s
+// or use binary search on square size s

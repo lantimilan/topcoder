@@ -1,0 +1,2 @@
+p500, off by one
+p1000, first, bit shift by val or val-1, then K might be 2*N, which could be more than 50

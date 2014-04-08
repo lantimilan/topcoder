@@ -47,7 +47,7 @@ struct edge {
 };
 
 typedef pair<int, int> PII;  // rem, node
-typedef pair<long long, PII> PLL;  // it is enough to use int here, since path length is at most 50 * 10^4, T is irrelevant here
+typedef pair<long long, PII> PLL;
 
 long long dist[20000+5][55];
 priority_queue<PLL> que;

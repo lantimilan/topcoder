@@ -9,6 +9,13 @@
 // now for each row, the sum is a[i] * b[1], a[i] * b[2], ...
 // for each col, the sum is a[1] * b[j], a[2] * b[j], ...
 //
+// if n == m, you can instead do this,
+// 1,2,3,...,n
+// 2,3,...n,1
+// ...
+// n,1,2,...,n-1
+// so that you have a permutation of 1..n in every row and every col
+//
 // now the hard part is to find n positive integers small enough,
 // that is, no more than 10^8
 // if there is no such limit, then the following recursive idea will work

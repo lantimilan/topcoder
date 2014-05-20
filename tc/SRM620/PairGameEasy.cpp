@@ -17,34 +17,29 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
 
 using namespace std;
 
-set<pair<int,int> > dp;
+const int MAXN = 1005;
+int dp[MAXN][MAXN];
 
 class PairGameEasy {
 public:
 	string able(int a, int b, int c, int d) {
         string good = "Able to generate";
         string bad = "Not able to generate";
-        dp.clear();
+        memset(dp, 0, sizeof dp);
+        dp[a][b] = 1;
+        for (int x = 0; x < MAXN; ++x)
+        for (int y = 0; y < MAXN; ++y)
+            if (dp[x][y] && x+y < MAXN) {
+                dp[x][x+y] = dp[x+y][y] = 1;
+            }
 
-        dfs(a, b);
-        if (dp.count(make_pair(c,d))) return good;
+        if (dp[c][d]) return good;
         else return bad;
 	}
-
-    void dfs(int a, int b) {
-        if (a > 1000 || b > 1000) return;
-        dp.insert(make_pair(a,b));
-        int x, y;
-        x = a; y = b;
-        y += x;
-        if (!dp.count(make_pair(x,y))) dfs(x, y);
-        x = a; y = b;
-        x += y;
-        if (!dp.count(make_pair(x,y))) dfs(x, y);
-    }
 };
 
 

@@ -24,17 +24,15 @@ using namespace std;
 class CandidatesSelectionEasy {
 public:
 	vector <int> sort(vector <string> score, int x) {
-		// insertion sort
         int n = score.size();
-        vector<pair<int,int> > skills(n);  // skill, id
+        vector<pair<int,int> > vec(n);
         for (int i = 0; i < n; ++i) {
-            skills[i] = make_pair('Z' - score[i][x], -i);
+            vec[i] = make_pair(score[i][x], i);
         }
-        std::sort(skills.begin(), skills.end());
+        std::sort(vec.begin(), vec.end());
         vector<int> ans(n);
-        for (int i = n-1; i >= 0; --i) {
-            ans[i] = -skills[n-1-i].second;
-        }
+        for (int i = 0; i < n; ++i)
+            ans[i] = vec[i].second;
         return ans;
 	}
 };

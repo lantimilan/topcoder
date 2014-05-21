@@ -81,10 +81,6 @@ public final class Trie {
         return queryHelper(root, word, 0);
     }
     public List<String> queryHelper(Node root, String word, int start) {
-        if (start >= word.length()) {
-            return new ArrayList<String>();
-        }
-
         String firstChar = word.substring(start, start+1);
         HashMap<String, Node> children = root.getChildren();
         List<String> result = new ArrayList<String>();
@@ -92,21 +88,27 @@ public final class Trie {
             for (String key: children.keySet()) {
                 Node child = children.get(key);
                 String w = child.getWord();
-                if (!w.isEmpty()) {
-                    result.add(w);
+                if (start+1 == word.length()) {
+                    if (!w.isEmpty()) {
+                        result.add(w);
+                    }
+                } else if (start+1 < word.length()){
+                    List<String> childList =
+                        queryHelper(children.get(key), word, start+1);
+                    result.addAll(childList);
                 }
-                List<String> childList =
-                    queryHelper(children.get(key), word, start+1);
-                result.addAll(childList);
             }
         } else if (children.containsKey(firstChar)) {
             Node child = children.get(firstChar);
             String w = child.getWord();
-            if (!w.isEmpty()) {
-                result.add(w);
+            if (start+1 == word.length()) {
+                if (!w.isEmpty()) {
+                    result.add(w);
+                }
+            } else if (start+1 < word.length()) {
+                List<String> s = queryHelper(children.get(firstChar), word, start+1);
+                result.addAll(s);
             }
-            List<String> s = queryHelper(children.get(firstChar), word, start+1);
-            result.addAll(s);
         }
         return result;
     }
@@ -119,7 +121,7 @@ public final class Trie {
             dict.add(word);
         }
         Trie trie = new Trie(dict);
-        String s = "**";
+        String s = "sector****";
         List<String> result = trie.query(s);
         System.out.println(result);
     }

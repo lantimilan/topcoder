@@ -125,3 +125,6 @@ int main()
 }
 
 // careful, if you do not return, then you got segmentation fault
+//
+// TODO: wrap everything into a BinaryTree class
+

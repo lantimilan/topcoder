@@ -7,33 +7,45 @@
 #include <vector>
 using namespace std;
 
+/**
+ * what is an ip address
+ * 0 to 255
+ * no leading zero
+ */
 class Solution {
 public:
     vector<string> restoreIpAddresses(string s) {
-        if (s.empty()) return vector<string>();
-        int n = s.size();
-        vector<vector<vector<string> > > dp(n+1);
-        dp[1] = vector<vector<string> >(1, vector<string>(1, s.substr(0,1)));
-
-        for (int i = 2; i <= n; ++i) {
-            for (int k = 0; k < dp[i-1].size(); ++k) {
-                // either extend last token, or append as a new token
-                vector<string> cur = dp[i-1][k];
-                string last = cur[cur.size()-1];
-                string next = last + s[i-1];
-                cur.push_back(string(1, s[i-1])); dp[i].push_back(cur);
-                cur.pop_back();
-                cout << cur.size() << endl;
-                if (next[0] != '0')
-                    if (next.length() < 3 || (next.length() == 3 && next <= "255")) {
-                         cur.pop_back(); cur.push_back(next); dp[i].push_back(cur);
-                    }
-                cout << cur.size() << endl;
-            }
-        }
+        // two issues in my previous implementation
+        // 1. the intended solution is that you have to have exactly 4 parts for an ip address
+        // 2. ip address has no leading zero except zero
+        // 3. I forgot to return and got Segfault again!
         vector<string> ip_address;
-        for (int k = 0; k < dp[n].size(); ++k) {
-            ip_address.push_back(join(dp[n][k], '.'));
+        if (s.length() > 3 * 4) return ip_address;
+        int n = s.size();
+        int a[5];
+        a[0] = 0; a[4] = n;
+        for (a[1] = 1; a[1] < n; ++a[1])
+        for (a[2] = a[1]+1; a[2] < n; ++a[2])
+        for (a[3] = a[2]+1; a[3] < n; ++a[3]) {
+            vector<string> vec;
+            for (int i = 0; i < 4; ++i) vec.push_back(s.substr(a[i], a[i+1] - a[i]));
+            // now check each parts
+            // 1. length in 1,2,3
+            // 2. val in 0 to 255
+            // 3. no leading 0 if not zero
+            bool good = true;
+            for (int i = 0; i < 4; ++i) {
+                string part = vec[i];
+                int len = part.length();
+                if (1 <= len && len <= 3) {
+                    if (len > 1 && part[0] == '0') good = false;
+                    if (len == 3 && part > "255") good = false;
+                } else { good = false; }
+            }
+            if (good) {
+                string ip = join(vec, '.');
+                ip_address.push_back(ip);
+            }
         }
         return ip_address;
     }

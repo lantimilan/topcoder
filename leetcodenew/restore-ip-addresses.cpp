@@ -57,3 +57,6 @@ int main()
 }
 
 // interesting: got output limit exceeded
+// because the intended solution indicates an ip consists of 4 parts
+// and OJ is kind enough to supply very long string and expect you
+// to detect this by checking whether length <= 12 as the first thing

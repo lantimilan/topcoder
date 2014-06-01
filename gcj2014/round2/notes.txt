@@ -1,0 +1,7 @@
+Failed in round 2 again.
+Start was good and solved A in the first try, only 10min.
+Then got stuck with a wrong idea in B, spent all time without getting a clue.
+Should try a proof or a counter example, instead, read the problem many td the problem statement is short enough so there is no trick there. Also checked implementation very carefully but there is nothing wrong there.
+Lessons learned:
+watashi and xiaowuc1 failed 4 and 5 times respectively. However both are able to come up with a DP solution that got accepted.
+When you do not have the clever solution, or when your first idea fails, can you find alternative solution that are guaranteed to be correct?

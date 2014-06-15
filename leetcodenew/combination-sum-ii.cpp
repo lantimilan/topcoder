@@ -9,38 +9,49 @@ public:
     map<pair<int,int>, vector<vector<int> > > memo;
 
     vector<vector<int> > combinationSum2(vector<int> &num, int target) {
+        sort(num.begin(), num.end());
+        vector<int>::iterator it; for (it = num.begin(); it != num.end(); ++it) if (*it > target) break;
+        num.erase(it, num.end());
         int n = num.size();
         int T = target;
-        vector<vector<int> > dp(n+1, vector<int>(T+1));
-        vector<vector<vector<int> > > pre(n+1, vector<vector<int> >(T+1, vector<int>()));
-        dp[0][0] = 1;
+        vector<vector<vector<vector<int> > > > dp(n+1, vector<vector<vector<int> > >(T+1));
+
+        dp[0][0] = vector<vector<int> >(1, vector<int>());
         for (int i = 1; i <= n; ++i)
         for (int t = 0; t <= T; ++t) {
-            if (dp[i-1][t]) {
-                dp[i][t] = 1;
-                pre[i][t].push_back(t);
+            if (!dp[i-1][t].empty()) {
+                dp[i][t] = dp[i-1][t];
             }
             if (t >= num[i-1]) {
                 int p = t - num[i-1];
-                if (dp[i-1][p]) {
-                    dp[i][t] = 1;
-                    pre[i][t].push_back(p);
+                if (!dp[i-1][p].empty()) {
+                    for (int x = 0; x < dp[i-1][p].size(); ++x) {
+                        vector<int> v = dp[i-1][p][x];
+                        v.push_back(num[i-1]);
+                        dp[i][t].push_back(v);
+                    }
                 }
             }
+            dedupe(dp[i][t]);
         }
-        memo.clear();
-        vector<vector<int> > ans;
-        if (!dp[n][T]) return ans;
-        ans = construct(target, n, pre, num);
-        for (int i = 0; i < ans.size(); ++i) sort(ans[i].begin(), ans[i].end());
-        sort(ans.begin(), ans.end());
-        ans.erase(unique(ans.begin(), ans.end()), ans.end());
+        //memo.clear();
+        //vector<vector<int> > ans;
+        //if (!dp[n][T]) return ans;
+        //ans = construct(target, n, pre, num);
+        vector<vector<int> > ans = dp[n][T];
         return ans;
     }
 
+    void dedupe(vector<vector<int> > &vv) {
+        if (vv.empty()) return;
+        for (int i = 0; i < vv.size(); ++i) sort(vv.begin(), vv.end());
+        sort(vv.begin(), vv.end());
+        vv.erase(unique(vv.begin(), vv.end()), vv.end());
+    }
+    /* recursion might be too expensive
     vector<vector<int> > construct(int target, int n, const vector<vector<vector<int> > > &pre, const vector<int> &num) {
         if (n == 0) return vector<vector<int> >(1, vector<int>());
-        //if (memo.count(make_pair(target, n))) return memo[make_pair(target, n)];
+        if (memo.count(make_pair(target, n))) return memo[make_pair(target, n)];
         vector<vector<int> > ans;
         for (int i = 0; i < pre[n][target].size(); ++i) {
             int p = pre[n][target][i];
@@ -58,6 +69,7 @@ public:
         }
         return memo[make_pair(target, n)] = ans;
     }
+    */
 };
 
 int main()

@@ -1,58 +1,44 @@
-vector<vector<int> > range_min;
+/**
+* longest-valid-parentheses.cpp
+* https://oj.leetcode.com/problems/longest-valid-parentheses/
+*/
 class Solution {
 public:
-    // observation: let s[i..j] be a valid parenthesis segment, then lcnt[j] = lcnt[i-1]
-    // this is not enough, lcnt cannot go down during this segment
-    // check each pair and range minimum, O(n^3), likely TLE
+    // use a stack to keep track of previous lparen
+    // use a vector<Interval> for possible merge
+    // actually the stack need only contain the pos of lparen, no need to store '('
     int longestValidParentheses(string s) {
-        map<int, vector<int> > lcnt_map;  // lcnt, (first, last)
-        vector<int> lcnt_vec(s.size());
-        int lcnt = 0;
-        for (int i = 0; i < s.size(); ++i) {
-            if (s[i] == '(') lcnt++;
-            else lcnt--;
-            lcnt_vec[i] = lcnt;
-            if (lcnt_map.count(lcnt)) {
-                lcnt_map[lcnt].push_back(i);
-            } else {
-                lcnt_map[lcnt] = vector<int>(1, i);
-            }
-        }
-        int n = s.size();
-        //vector<vector<int> > range_min(n, vector<int>(n)); // MLE
-        range_min.resize(n);
-        for (int i = 0; i < n; ++i) range_min[i].resize(n-i+1);  // to address range_min[i][n], you need to allocate n+1
-
-        for (int i = 0; i < n; ++i) range_min[i][1] = lcnt_vec[i];
-
-        for (int len = 2; len <= n; ++len)
-        for (int i = 0; i + len <= n; ++i) {
-            int j = i+len-1;
-            range_min[i][len] = min(range_min[i][len-1], lcnt_vec[j]);
-        }
-
         int maxlen = 0;
-        map<int, vector<int> >::const_iterator it;
-        for (it = lcnt_map.begin(); it != lcnt_map.end(); ++it) {
-            vector<int> vec = it->second;
-            for (int i = 0; i < vec.size(); ++i)
-            for (int j = i+1; j < vec.size(); ++j) {
-                int start = vec[i], end = vec[j];
-                int mincnt = range_min[start][end-start+1];
-                /*
-                int mincnt = it->first;
-                for (int k = start; k <= end; ++k) {
-                    mincnt = min(mincnt, lcnt_vec[k]);
-                }*/
-                if (mincnt == it->first) {
-                    int len = end - start + 1;
-                    maxlen = max(maxlen, len);
+        int n = s.size();
+        vector<pair<int, int> > vec;
+        stack<pair<char, int> > st;  // paren, pos
+        for (int i = 0; i < n; ++i) {
+            char ch = s[i];
+            int pos = i;
+            if (s[i] == '(') st.push(make_pair(s[i], pos));
+            else {
+                if (st.empty()) {}  // do nothing
+                else {
+                    int prev = st.top().second; st.pop();
+                    pair<int, int> cur = make_pair(prev, pos);
+                    while (!vec.empty()) {
+                        if (contained(vec.back(), cur)) vec.pop_back();
+                        else if (vec.back().second + 1 == prev) {  // concat with vec.back()
+                            prev = vec.back().first; vec.pop_back();
+                        } else break;  // disjoint
+                    }
+                    vec.push_back(make_pair(prev, pos));
                 }
             }
         }
+        for (int i = 0; i < vec.size(); ++i) {
+            int len = vec[i].second - vec[i].first + 1;
+            maxlen = max(maxlen, len);
+        }
         return maxlen;
     }
-};
 
-// O(n^2) also TLE
-// looks need a O(n) algorithm
+    bool contained(pair<int, int> small, pair<int, int> large) {
+        return large.first < small.first && small.second < large.second;
+    }
+};

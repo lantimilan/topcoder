@@ -31,20 +31,23 @@ public:
             if (*s || *p) return false;
             return true;
         }
-        // match the block in patt from its last '*' to end
+        // match the block in patt from ist last '*' to end
         const char *send, *pend;
         for (send = src; *send; ++send) ;
         for (pend = patt; *pend; ++pend) ;
+        cout << (send - src) << ' ' << (pend - patt) << endl;
         for (s = --send, p = --pend; p > last; --s, --p) {
             if (s < src) return false;
             if (!charMatch(*s, *p)) return false;
         }
         send = s+1; pend = p;  // now we work on src[0..send-1] and patt[0..pend-1], we know patt[pend] is '*'
+//cout << send - src << ' ' << pend - patt << endl;
         // first match prefix of src[0..send-1] and prefix of patt[0..pend-1] where prefix stops at first '*' in patt
-        for (start = src, p = patt; start < send && p < pend; ++start, ++p) {
+        for (start = src, p = patt; p < pend; ++start, ++p) {
             if (*p == '*') break;
-            if (!charMatch(*start, *p)) return false;
+            if (!charMatch(*start, *p)) return false;  // this also covers when src[] is shorter than patt[0..first'*'-1]
         }
+
         // now p points to the first '*' in patt, there must be one '*' because we found last points to the last '*' earlier
         for (; p < pend; ) {
             // find the first segment start at nonstar and end with a '*'
@@ -77,7 +80,8 @@ public:
         const char *text = textStart;
         const char *patt = pattStart;
         int n, m;
-        n = textEnd - textStart; m = pattEnd - pattStart; assert(n > 0 && m > 0);
+        n = textEnd - textStart; m = pattEnd - pattStart;  //if (n < 1 || m < 1) return NULL;
+        //assert(n > 0 && m > 0);
         vector<int> q(m);
         KMPcalc(pattStart, pattEnd, q);
 
@@ -99,9 +103,8 @@ public:
     bool charMatch(char c1, char c2) {
         if (c1 == '?' || c2 == '?') return true;
         return c1 == c2;
-    }
+   }
 };
-
 int main()
 {
     Solution sol;

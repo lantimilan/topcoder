@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <string>
 using namespace std;
 
@@ -48,7 +49,7 @@ void solve(int tcase)
     // output solution
     cout << "Case #" << tcase << ": ";
     // sol here
-    cout << E[N];
+    cout << fixed << setprecision(5) << E[N];
     cout << endl;
 }
 

@@ -13,7 +13,6 @@ using namespace std;
 
 const int INF = 20000+5;  // total number of letters for all words is 20000
 int N, K;
-int ID;
 
 struct Node {
     bool isWord;
@@ -27,17 +26,16 @@ struct Node {
         memset(cost, 0, sizeof cost);
         depth = 0;
     }
-
-    void cleanup() {
-        isWord = false;
-        memset(child, 0, sizeof child);
-        memset(cost, 0, sizeof cost);
-        depth = 0;
-    }
 };
 
-Node nodes[20000+5];
 int dp[30][105];  // (child, nwords)
+
+void cleanup(Node *root)
+{
+    if (!root) return;
+    for (int c = 0; c < 26; ++c) cleanup(root->child[c]);
+    delete root;
+}
 
 Node* add_word(Node *root, const string& word)
 {
@@ -49,7 +47,7 @@ Node* add_word(Node *root, const string& word)
         if (next) {
             parent = next;
         } else {
-            next = &nodes[ID++];
+            next = new Node();
             next->depth = parent->depth + 1;
             parent->child[ch-'a'] = next;
             parent = next;
@@ -67,17 +65,8 @@ void chmin(int &a, int b)
 int go(Node *root)
 {
     if (root == NULL) return 0;
+
     assert(root != NULL);
-    for (int c = 0; c < 26; ++c) {
-        if (root->child[c]) {
-            int nc = 0;
-            Node *t = 0;
-            for (int i = 0; i < 26; ++i) {
-                if (root->child[c]->child[i]) t = root->child[c]->child[i];
-                nc += (root->child[c]->child[i] != 0);
-            }
-        }
-    }
     for (int c = 0; c < 26; ++c) go(root->child[c]);
 
     // sum children
@@ -110,16 +99,15 @@ int go(Node *root)
 
 void solve(int tcase)
 {
-    ID = 0;
-    for (int i = 0; i < 20000+5; ++i) nodes[i].cleanup();
     cin >> N >> K; //cout << N << ' ' << K << endl;
-    Node *root = &nodes[ID++];
+    Node *root = new Node();
     for (int i = 0; i < N; ++i) {
         string word; cin >> word;
         add_word(root, word);
     }
 
     int ans = go(root);
+    cleanup(root);
     cout << "Case #" << tcase << ": ";
     // output sol
     cout << ans;

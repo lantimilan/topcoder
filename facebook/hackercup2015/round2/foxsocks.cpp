@@ -66,6 +66,11 @@ void solve(int tcase) {
     for (int i = 0; i < M; ++i) {
         int op = O[i];
         int sum = 0;
+        // if you can keep track of range sum up to date in O(lgn) time
+        // then each op can be done in O(lgn) time
+        // segment tree
+        // each node needs to remember range sum, and range oddsum
+        // oddsum can be obtained from numOfOdd and numOfEven
         for (int k = 0; k < B[i]; ++k) {
             int bin = (A[i]-1 + k); if (bin >= N) bin -= N;
             int added = 0;

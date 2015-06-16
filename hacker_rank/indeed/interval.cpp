@@ -171,15 +171,14 @@ int main() {
             int x1, x2;
             if (v == 0) {
                 x1 = l; x2 = r+1;
-            // TODO: deal with minval = 1
-            /*
-            else if (v == 1) {
+            } else if (v > 1) { // minval is 2 or larger, return single element.
+                x1 = p.second + 1;
+                x2 = x1;
+            } else { // TODO: deal with minval = 1
                 assert(!ones.empty());
                 set<pii>::iterator it = ones.lower_bound(pii(l, r+1));
-                if (it == ones.end()) {
-                    --it;
-                    x1 = l+1; x2 = it->second;
-                } else if (it->first <= l) {
+                assert(it != ones.end());
+                if (it->first <= l) {
                     x1 = l+1; x2 = r+1;
                 } else {
                     if (it == ones.begin()) {
@@ -194,24 +193,9 @@ int main() {
                         }
                     }
                 }
-            */
-            } else {
-                x1 = p.second; x2 = x1 + 1;
-                if (!ones.empty()) {  // expand to left and right for ones
-                    set<pii>::iterator it = ones.lower_bound(pii(x1, x2));
-                    if (it != ones.end()) {
-                        if (it->first <= x1) x2 = it->second;
-                    }
-                    if (it != ones.begin()) {
-                        --it;
-                        if (it->second >= x1) x1 = it->first;
-                    }
-                    x1 = max(x1, l);
-                    x2 = min(x2, r+1);
-                }
             }
             printf("%d %d %d\n", v, x1+1, x2);
-        } else {
+        } else {  // op is 2, change A[] to new val.
             int l, v; scanf("%d%d", &l, &v); --l;
             // update ones
             if (A[l] == 1 && v != 1) {

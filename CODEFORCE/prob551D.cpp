@@ -4,8 +4,12 @@ using namespace std;
 
 unsigned long long N, K;
 int L, M;
-int mat[2][2];
-int pow2;
+
+int mod_sub(int a, int b) {
+    int ans = a - b;
+    if (ans < 0) ans += M;
+    return ans;
+}
 
 int fastpow(int base, long long expo) {
     int ans = 1;
@@ -53,12 +57,6 @@ void mat_pow(int base[2][2], long long expo, int res[2][2]) {
     }
 }
 
-void init() {
-    int base[2][2]; base[0][0] = base[0][1] = base[1][0] = 1; base[1][1] = 0;
-    mat_pow(base, N-1, mat);
-    pow2 = fastpow(2, N);
-}
-
 int main() {
     cin >> N >> K >> L >> M;
 
@@ -67,9 +65,9 @@ int main() {
         cout << 0 << endl; return 0;
     }
 
-    init();
-    long long ans = 1LL % M;  // must have this or M = 1 breaks
-    for (int b = 0; b < L; ++b) {
+    int base[2][2]; base[0][0] = base[0][1] = base[1][0] = 1; base[1][1] = 0;
+    int mat[2][2];
+    mat_pow(base, N-1, mat);
     // let dp[n][0] be number of bit string of length n with no consecutive
     // ones and end up with 0, similarly define dp[n][1]
     // then
@@ -80,17 +78,16 @@ int main() {
     // | f(n,0) | = |1 1| | f(n-1,0) |
     // | f(n,1) |   |1 0| | f(n-1,1) |
     //cout << mat[0][0] << mat[0][1] << mat[1][0] << mat[1][1] << endl;
-    int cnt = (1LL*mat[0][0] + mat[0][1] + mat[1][0] + mat[1][1]) % M;
-    //cout << "cnt " << cnt << endl;
-    int curr;
-    if (K & (1LL << b)) {
-        curr = (pow2 - cnt) % M;
-        if (curr < 0) curr += M;
-    } else {
-        curr = cnt;
+    int cnt0 = (1LL*mat[0][0] + mat[0][1] + mat[1][0] + mat[1][1]) % M;
+    int cnt1 = mod_sub(fastpow(2, N), cnt0);
+
+    int ones = 0, zeros = 0;
+    for (int b = 0; b < L; ++b) {
+        if (K & 1LL << b) ones++;
     }
-    ans = ans * curr % M;
-    }
+    zeros = L - ones;
+
+    long long ans = 1LL * fastpow(cnt0, zeros) * fastpow(cnt1, ones) % M;
     cout << ans << endl;
 }
 

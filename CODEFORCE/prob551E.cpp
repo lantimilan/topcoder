@@ -10,6 +10,7 @@
 // Each query can be answered by looking at partial blocks elements and full
 // blocks. And each update works the same way.
 
+#include <cstdio>
 #include <iostream>
 #include <set>
 using namespace std;
@@ -108,7 +109,9 @@ int process_query(int y) {
 }
 
 int main() {
-    int n, q; cin >> n >> q; N = n;
+    int n, q; //cin >> n >> q;
+    scanf("%d%d", &n, &q);
+    N = n;
     int nblocks = (n + BSIZE-1) / BSIZE; NBLOCKS = nblocks;
     for (int b = 0; b < nblocks; ++b) {
         int l = b * BSIZE;
@@ -118,17 +121,17 @@ int main() {
         blocks[b].extra = 0;
     }
     for (int i = 0; i < n; ++i) {
-        int v; cin >> v;
+        int v; scanf("%d", &v); //cin >> v;
         int bindex = i / BSIZE;
         blocks[bindex].elts.insert(make_pair(v, i));
     }
     for (int i = 0; i < q; ++i) {
         int op; cin >> op;
         if (op == 1) {
-            int l, r, x; cin >> l >> r >> x;
+            int l, r, x; scanf("%d%d%d", &l, &r, &x); //cin >> l >> r >> x;
             process_update(l-1, r-1, x);
         } else {
-            int y; cin >> y;
+            int y; scanf("%d", &y); //cin >> y;
             int ans = process_query(y);
             cout << ans << endl;
         }

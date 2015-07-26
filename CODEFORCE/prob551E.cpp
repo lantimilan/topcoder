@@ -9,21 +9,29 @@
 // So we make blocks of size 1000, and then we have at most 500 blocks.
 // Each query can be answered by looking at partial blocks elements and full
 // blocks. And each update works the same way.
-
+//
+// use set got TLE, so try vector and then sort.
+#include <algorithm>
 #include <cstdio>
 #include <iostream>
 #include <set>
+#include <vector>
 using namespace std;
 
 const int BSIZE = 1000;
 int N, NBLOCKS;
 
-typedef set<pair<long long, int>> ElemType;
+typedef vector<pair<long long, int>> ElemType;
 struct Block {
     int l, r;
     ElemType elts;  // (val, pos)
     long long extra;
 
+    Block() {}
+    Block(int _l, int _r, const ElemType &_elts) : l(_l), r(_r), elts(_elts) {
+        extra = 0;
+        sort(elts.begin(), elts.end());
+    }
     int get_left(int l, int r, long long val);
     int get_right(int l, int r, long long val);
     void update(int l, int r, int incr);
@@ -42,7 +50,9 @@ void Block::print() {
 // or -1 if there is no val in the intersection
 int Block::get_left(int l, int r, long long val) {
     long long target = val - extra;
-    ElemType::iterator it = elts.lower_bound(make_pair(target, l));
+    //ElemType::iterator it = elts.lower_bound(make_pair(target, l));
+    ElemType::iterator it =
+        lower_bound(elts.begin(), elts.end(), make_pair(target, l));
 
     if (it->first != target) return -1;
     else return it->second;
@@ -50,10 +60,12 @@ int Block::get_left(int l, int r, long long val) {
 
 int Block::get_right(int l, int r, long long val) {
     long long target = val - extra;
-    ElemType::iterator it = elts.lower_bound(make_pair(target, r+1));
-    if (it != elts.begin()) --it;
-    if (it->first == target) return it->second;
-    return -1;
+    //ElemType::iterator it = elts.lower_bound(make_pair(target, r+1));
+    ElemType::iterator it =
+        lower_bound(elts.begin(), elts.end(), make_pair(target, r+1));
+    if (it != elts.begin()) { --it; }
+    if (it->first == target) { return it->second; }
+    else { return -1; }
 }
 
 // If A[l..r] covers full block, update extra by incr, else update the elts
@@ -62,15 +74,31 @@ void Block::update(int l, int r, int incr) {
     if (l <= this->l && this->r <= r) {
         extra += incr;
     } else {
-        ElemType newelts;
+        /*ElemType newelts = elts;
         for (const auto& p : elts) {
-            long long newval = p.first;
+            long long val = p.first;
+            long long pos = p.second;
             if (l <= p.second && p.second <= r) {
-                newval += incr;
+                newelts.erase(make_pair(val, pos));
+                newelts.insert(make_pair(val+incr, pos));
             }
-            newelts.insert(make_pair(newval, p.second));
         }
-        elts = newelts;
+        elts = newelts;*/
+        /*
+        for (auto& p : elts) {
+            if (l <= p.second && p.second <= r) {
+                p.first += incr;
+            }
+        }
+        */
+        ElemType::iterator it;
+        for (it = elts.begin(); it != elts.end(); ++it) {
+            int pos = it->second;
+            if (l <= pos && pos <= r) {
+                it->first += incr;
+            }
+        }
+        sort(elts.begin(), elts.end());
     }
 }
 
@@ -123,7 +151,12 @@ int main() {
     for (int i = 0; i < n; ++i) {
         int v; scanf("%d", &v); //cin >> v;
         int bindex = i / BSIZE;
-        blocks[bindex].elts.insert(make_pair(v, i));
+        //blocks[bindex].elts.insert(make_pair(v, i));
+        blocks[bindex].elts.push_back(make_pair(v, i));
+    }
+    for (int b = 0; b < nblocks; ++b) {
+        ElemType &elts = blocks[b].elts;
+        sort(elts.begin(), elts.end());
     }
     for (int i = 0; i < q; ++i) {
         int op; cin >> op;

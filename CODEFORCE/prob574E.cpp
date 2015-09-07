@@ -26,7 +26,7 @@ pair<bool, int> dfs(int root) {
         if (deg > 2) cnt++;
         maxdeg = max(maxdeg, max(deg, (int)graph[next].size()));
     }
-    return make_pair(cnt <= 2, maxdeg);
+    return make_pair((root == 0 ? cnt <= 2 : cnt <= 1), maxdeg);
 }
 
 int main() {

@@ -59,6 +59,10 @@ double parse(string s) {
     return d;
 }
 
+long long myround(double d) {
+    return (long long)(d * 100 + 0.5);
+}
+
 int main() {
     int N; cin >> N;
     for (int i = 0; i < N; ++i) {
@@ -78,14 +82,14 @@ int main() {
         string transport; cin >> transport;
         double minutes; cin >> minutes;
         double reach = calc_move(transport, minutes);
-        reach = round(reach * 100);
+        long long rounded_reach = myround(reach);
         //cout << "reach " << reach << endl;
         vector<pair<double, int>> attractions;
         for (int i = 0; i < N; ++i) {
             double dist = calc_dist(mylat, mylon, lat[i], lon[i]);
-            double rounded_dist = round(dist * 100);
+            long long rounded_dist = myround(dist);
             //if ((long long)dist <= (long long)reach) {
-            if (rounded_dist <= reach) {
+            if (rounded_dist <= rounded_reach) {
                 //cout << "found: " << dist << ' ' << id[i] << endl;
                 attractions.push_back(make_pair(rounded_dist, id[i]));
             }

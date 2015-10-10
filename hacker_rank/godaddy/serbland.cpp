@@ -37,19 +37,19 @@ int main() {
             start = end = it;
             if (end->first == y) ++end;
         }
-        if (start != ys.begin()) {
-        for (--start; start != ys.begin(); --start) {
+        for (start; start != ys.begin(); --start) {
             if (start->second > curr) break;
-        }
         }
         if (start != ys.begin()) {
             ++start;
-        } else {
+        } else {  // start == ys.begin()
             if (start->second > curr) ++start;
         }
-        ys.erase(start, it);
+        ys.erase(start, end);  // Stupid bug: wrote it instead of end
         ys.insert(make_pair(y, curr));
     }
 
     cout << ys.begin()->second << endl;
 }
+
+// AC

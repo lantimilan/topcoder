@@ -7,24 +7,8 @@
 #include <vector>
 using namespace std;
 
-// A biconnected component (bcc) is defined by an edge with parent being arti
-// or root, and child being a non-arti. Edges within the same cycle is in the
-// same bcc.
-// To define a bcc, use a non-leaf, non-arti neighbor of an arti, then all
-// vertices reachable, bounded by arti's, define this bcc. There is a catch,
-// there might be no such node, because of pendant nodes, the leaf. Example is
-// a triangle of 1,2,3, then 1-4, 2-5, 3-6. So we need to recursively remove
-// all leaves.
-// Why? A bridge is either both arti, or one arti and one leaf.
-// Consider all non-leaf, non-arti nodes in such a subgraph, removing any one
-// does not disconnect the subgraph, therefore any two nodes in this subgraph,
-// including the bounding arti's, are connected by two edge-disjoint paths.
-//
-// bcc is defined by a collection of edges, but we work with vertices. For bcc,
-// vertices are of three classes, arti, leaf (deg=1) and non-arti-non-leaf.
-//
-// if a node connects to a leaf, then it must be arti, because it is the only
-// connection to the rest of graph.
+// A biconnected component (bcc) is defined by a non-bridge edge and all edges
+// in a common cycle are in this bcc.
 //
 // The standard way is to get all bridges, then build bcc starting with a non-
 // bridge edge and collect all edges in the same bcc. This is because bcc
@@ -35,18 +19,32 @@ using namespace std;
 //     bridge e: the removal of e disconnects G
 //     biconnected component bcc: e1 and e2 are in the same bcc iff they are in
 // the same cycle.
+//
+// edge(p,v) is a bridge iff none of nodes in subtree(v) can reach p or its
+// ancestor, that is low[v] >= discover[v]
+//
+// We know that a bcc is from some subtree, that is, they do not split in two
+// different subtrees.
+// Also, a bcc is rooted at either tree root, or an articulation point, because
+// a non-articulation point has some descendant with a back edge going to
+// parent or upper and would thus include its parent into this bcc.
+//
+// Algorithm bcc:
+// for each node v
+// if v is root or arti, then
+// for each child c of v
+// if edge(v,c) is not bridge
+// then start from c to explore the subtree and include nodes that do not make
+// their parent an articulation point, because they have some decendant with
+// a back edge going to parent or above.
 int N, M, Q;
 int CC;
 int BCC;
 vector<set<int>> graph;
 vector<set<int>> label;
-queue<int> que;
 
-int is_root[100000+5];
-int nchild[10000+5];
 int low[100000+5];
 int vis[100000+5];
-int vis2[100000+5];
 int discover[100000+5];
 int parent[100000+5];
 int arti[100000+5];
@@ -55,16 +53,13 @@ void chmin(int &x, int y) {
     if (x > y) x = y;
 }
 
-bool is_leaf(int v) {
-    return graph[v].size() == 1;
-}
-
-void dfs2(int start) {
-    vis2[start] = 1;
-    for (int next : graph[start]) {
-        label[next].insert(BCC);
-        if (!arti[next] && !vis2[next]) {
-            dfs2(next);
+void dfs2(int first, int second) {
+    label[first].insert(BCC);
+    label[second].insert(BCC);
+    for (int next : graph[second]) if (parent[next] == second) {
+        if (low[next] < discover[second]) {
+            // there is a back edge from subtree of next to second or above
+            dfs2(second, next);
         }
     }
 }
@@ -75,56 +70,31 @@ void dfs(int start) {
     low[start] = discover[start];
     for (int next : graph[start]) {
         if (!vis[next]) {
-            parent[next] = start; nchild[start]++;
+            parent[next] = start;
             dfs(next);
+            if (low[next] >= discover[start]) { arti[start] = 1; }
             chmin(low[start], low[next]);
-            if (!is_root[start] && low[next] >= discover[start]) {
-                arti[start] = 1;
-            }
-        } else if (next != parent[start]) { // grandparent or beyond
+        } else if (next != parent[start]) { // back_edge, grandparent or beyond
             chmin(low[start], discover[next]);
         }
     }
-}
-
-void process() {
-    for (int i = 0; i < N; ++i) if (is_leaf(i)) {
-        assert(graph[i].size() == 1);
-        que.push(i);
-        while (!que.empty()) {
-            int start = que.front(); que.pop();
-            int next = *graph[start].begin();
-            graph[start].clear();
-            graph[next].erase(start);
-            if (is_leaf(next)) {
-                que.push(next);
-            }
-        }
-    }
+    //cout << start << ' ' << low[start] << ' ' << arti[start] << endl;
 }
 
 void biconnected() {
-    memset(is_root, 0, sizeof is_root);
-    memset(nchild, 0, sizeof nchild);
     memset(vis, 0, sizeof vis);
-    memset(vis2, 0, sizeof vis2);
     memset(parent, -1, sizeof parent);
-    memset(arti, 0, sizeof arti);
 
-    process();  // remove pendant vertices, recursively remove leaves
     CC = 0;
     for (int i = 0; i < N; ++i) if (!vis[i]) {
-        is_root[i] = 1;
         dfs(i);
-        if (nchild[i] > 1) {
-            arti[i] = 1;
-        }
     }
 
-    for (int i = 0; i < N; ++i) if (!arti[i] && !is_leaf(i) && !vis2[i]) {
-        BCC++;
-        label[i].insert(BCC);
-        dfs2(i);
+    for (int i = 0; i < N; ++i) if (arti[i])
+    for (int j : graph[i])  // build a bcc rooted at i and include j
+    if (parent[j] == i && low[j] == discover[i]) {
+        BCC++; //cout << i << ' ' << j << ' ' << BCC << endl;
+        dfs2(i,j);
     }
 }
 
@@ -161,6 +131,6 @@ int main() {
     }
 }
 
-// WA and TLE, wrong algorithm
-// Still WA ???? because I should just start from any non-arti-non-leaf to
-// start a bcc.
+// Accepted
+// Improvement: label the bcc with some node so that we can quickly check
+// whether two nodes were in the same bcc.

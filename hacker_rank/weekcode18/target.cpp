@@ -4,7 +4,7 @@
 using namespace std;
 
 const int M = 1e4;
-long long xy2[M+5];
+long long xy2[500000+5];
 long long R2[M+5];
 
 int main() {

@@ -1,4 +1,7 @@
 // abbr.cc
+// If you think you understand lcs, this one is a twist. Because of the
+// restriction that a[] cannot remove uppercase, and b[] cannot remove any
+// the recurrence is slightly different.
 #include <cctype>
 #include <iostream>
 #include <vector>

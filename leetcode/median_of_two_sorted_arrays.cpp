@@ -1,38 +1,65 @@
 class Solution {
 public:
-    // k is 0-based
-    int findkth(int A[], int m, int B[], int n, int k) {
-        int l1, r1, l2, r2;
-        l1 = 0; r1 = m; l2 = 0, r2 = n;
-        
-        // since k is 0-based, there are k+1 elements
-        // need to have non-empty (k+1)/2 and (k+1)/2 in
-        // both arrays, so k>0
-        // last element is at index mid1-1 and mid2-1
-        while (l1 < r1 && l2 < r2) {
-            int mid1, mid2;
-            mid1 = min(l1+(k+1)/2, r1);
-            mid2 = min(l2+(k+1)/2, r2);
-            if (k==0) return min(A[l1], B[l2]);
-            if (A[mid1-1] < B[mid2-1]) {  // throw away left of A[l1..r1]
-                k -= (mid1-l1);
-                l1 = mid1;
-            } else {  // throw away left of B[l2..r2]
-                k -= (mid2-l2);
-                l2 = mid2;
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size();
+        int n = nums2.size();
+        int lower_median = findkth((m+n+1)/2, nums1, nums2);
+        int upper_median = findkth((m+n)/2+1, nums1, nums2);
+        cout << lower_median << ' ' << upper_median << endl;
+        return (lower_median + upper_median) / 2.0;
+    }
+    
+    int findkth(int k, vector<int>& nums1, vector<int>& nums2) {
+        int ans;
+        if (bsearch(k, nums1, nums2, ans)) return ans;
+        if (bsearch(k, nums2, nums1, ans)) return ans;
+        else assert(false);
+    }
+    
+    bool bsearch(int k, vector<int>& src, vector<int>& dest, int& ans) {
+        int m = src.size();
+        int n = dest.size();
+        int s = k;
+        int lo = -1, hi = m;  // range is (lo, hi)
+        while (lo+1 < hi) {  // invariant: mid is always valid index and range nonempty
+            // cout << lo << ' ' << hi << endl;
+            int x = (lo+hi)/2;  // make progress because lo < l < hi
+            int l = x+1;
+            int r = s - l;
+            if (r < 0) {  // too many elements to the left of src[l-1]
+                hi = x;
+            } else if (r > n) {  // not enough elements to the left of src[l-1]
+                lo = x;
+            } else {
+                if (r == 0) {
+                    if (n == 0) {
+                        ans = src[x]; return true;
+                    } else if (src[x] <= dest[0]) {
+                        ans = src[x]; return true;
+                    } else {
+                        // we need none from dest, but some dest elements are <= src[x]
+                        // we need to search to the left of src[x]
+                        hi = x;
+                    }
+                }
+                // we need dest[r-1] <= src[l-1] <= (dest[r] or r == n)
+                if (dest[r-1] > src[x]) {  // src[l-1] too small
+                    lo = x;
+                } else {
+                    if (r >= n) {  // found kth, done
+                        ans = src[x];
+                        return true;
+                    } else {
+                        if (src[x] <= dest[r]) {
+                            ans = src[x];
+                            return true;
+                        } else {  // src[l-1] too big
+                            hi = x;
+                        }
+                    }
+                }
             }
         }
-        if (l1 < r1) return A[l1 + k];
-        else return B[l2 + k];
-    }
-    double findMedianSortedArrays(int A[], int m, int B[], int n) {
-        // Start typing your C/C++ solution below
-        // DO NOT write int main() function
-        int lower, upper;
-        // for m+n odd, it is (m+n)/2 and (m+n)/2
-        // for m+n even, it is (m+n)/2-1 and (m+n)/2
-        lower = findkth(A, m, B, n, (m+n-1)/2);
-        upper = findkth(A, m, B, n, (m+n)/2);
-        return (lower + upper) / 2.0;
+        return false;
     }
 };
